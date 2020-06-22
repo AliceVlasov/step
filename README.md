@@ -1,4 +1,4 @@
 # Google Student Training in Engineering Program
 
-This repo contains Alice's portfolio and STEP projects.
+This repo contains Alice's STEP portfolio and projects.
 
