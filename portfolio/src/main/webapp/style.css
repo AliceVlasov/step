@@ -7,3 +7,10 @@
 #greeting-container {
   margin-top: 20px;
 }
+
+#profile {
+    height: 200px;
+    width: 200px;
+    object-fit:contain;
+    object-position: left;
+}
