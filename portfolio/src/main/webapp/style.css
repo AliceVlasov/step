@@ -21,8 +21,8 @@ html, body {
 }
 
 #tabSelector {
-    background-color: beige;
     height: 25%;
+    margin-right: 18px;
 }
 
 .tab {
@@ -32,6 +32,7 @@ html, body {
     float: right;
     border-radius: 20% 20% 0 0;
     border: 1px solid black;
+    box-shadow: 8px -1px 8px 2px grey;
 }
 
 .tabName {
@@ -39,6 +40,12 @@ html, body {
     top: 50%;
     bottom: 50%;
     font-weight: 600;
+}
+
+.tabSelected {
+    background-color: lightpink;
+    border-bottom: 0;
+    
 }
 
 /* TAB PROPERTIES */
