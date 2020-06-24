@@ -5,17 +5,22 @@
     <title>My Portfolio</title>
     <link rel="stylesheet" href="style.css">
     <script src="script.js"></script>
+    <script> {
+        document.addEventListener('DOMContentLoaded', function() {
+            setUp();
+        }, false);   
+    } </script>
   </head>
   <body>
     <div id="content">
         <header id="header">
             <div id="titleWrapper"></div>
             <div id="tabSelector">
-                <div class="tab" id="Gallery">  <p class="tabName">Gallery</p>  </div>
-                <div class="tab" id="Projects"> <p class="tabName">Projects</p> </div>
+                <div class="tab" id="Gallery"><p class="tabName">Gallery</p> </div>
+                <div class="tab" id="Projects"><p class="tabName">Projects</p></div>
                 <div class="tab" id="Education"><p class="tabName">Education</p></div>
-                <div class="tab" id="General">  <p class="tabName">General</p>  </div>
-                <div class="tab" id="Welcome">  <p class="tabName">Welcome</p>  </div>
+                <div class="tab" id="General"><p class="tabName">General</p></div>
+                <div class="tab tabSelected" id="Welcome"><p class="tabName">Welcome</p></div>
             </div> 
         </header>
         <div id="tabContent">

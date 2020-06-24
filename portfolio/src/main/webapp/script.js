@@ -12,4 +12,43 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+function toggleClass(obj, className, toAdd) {
+    toAdd? obj.classList.add(className): obj.classList.remove(className);
+}
 
+function switchTabSelection(tabRemove, tabAdd) {
+    toggleClass(tabRemove, tabSelectedClass, false);
+    toggleClass(tabAdd, tabSelectedClass, true);
+
+}
+
+function prevSelectedTab() {
+    return document.getElementsByClassName(tabSelectedClass)[0];
+}
+
+
+function setTabEvents(tabs) {
+    var tab;
+    for (var i = 0; i < tabs.length; i++) {
+        tab = tabs[i];
+        tab.addEventListener("mouseover", function() {
+            toggleClass(this, tabHoverClass, true);
+        });
+
+        tab.addEventListener("mouseout", function() {
+            toggleClass(this, tabHoverClass, false);
+        });
+
+        tab.addEventListener("click", function() {
+            switchTabSelection(prevSelectedTab(), this);
+        });
+    }
+} // setTabEvents
+
+function setUp() {
+    var tabs = document.getElementsByClassName("tab");
+    setTabEvents(tabs);
+}
+
+const tabHoverClass = "tabHover";
+const tabSelectedClass = "tabSelected";
