@@ -25,6 +25,14 @@ html, body {
     height: 25%;
 }
 
+.tab {
+    background-color: aliceblue;
+    width: 15%;
+    height: 100%;
+    text-align: center;
+    float: right;
+}
+
 /* TAB PROPERTIES */
 
 #tabContent {
