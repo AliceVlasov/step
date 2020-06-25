@@ -9,23 +9,36 @@
         document.addEventListener('DOMContentLoaded', function() {
             setUp();
         }, false);   
-    } </script>
+    } 
+    </script>
   </head>
   <body>
     <div id="content">
         <header id="header">
             <div id="titleWrapper"></div>
             <div id="tabSelector">
-                <div class="tab" id="Gallery"><p class="tabName">Gallery</p> </div>
-                <div class="tab" id="Projects"><p class="tabName">Projects</p></div>
-                <div class="tab" id="Education"><p class="tabName">Education</p></div>
-                <div class="tab" id="General"><p class="tabName">General</p></div>
-                <div class="tab tabSelected" id="Welcome"><p class="tabName">Welcome</p></div>
+                <div class="tab galleryTab" id="GalleryTab"><p class="tabName">Gallery</p> </div>
+                <div class="tab projectsTab" id="ProjectsTab"><p class="tabName">Projects</p></div>
+                <div class="tab educationTab" id="EducationTab"><p class="tabName">Education</p></div>
+                <div class="tab generalTab" id="GeneralTab"><p class="tabName">General</p></div>
+                <div class="tab welcomeTab tabSelected" id="WelcomeTab"><p class="tabName">Welcome</p></div>
             </div> 
         </header>
         <div id="tabContent">
-            <div id="pictureWrapper"></div>
-            <div id="textWrapper"></div>
+            <div id="pictureWrapper">
+                <img class="tabContent tabPicture galleryTab" id="GalleryPic" src="" alt="Gallery Picture">
+                <img class="tabContent tabPicture projectsTab" id="ProjectsPic" src="" alt="Projects Picture">
+                <img class="tabContent tabPicture educationTab" id="EducationPic" src="" alt="Education Picture">
+                <img class="tabContent tabPicture generalTab" id="GeneralPic" src="" alt="General Picture">
+                <img class="tabContent tabPicture tabSelected welcomeTab" id="WelcomePic" src="" alt="Welcome Picture">
+            </div>
+            <div id="textWrapper">
+                <div class="tabContent tabText galleryTab" id="GalleryText" ><h1>GALLERY</h1></div>
+                <div class="tabContent tabText projectsTab" id="ProjectsText" ><h1>PROJECTS</h1></div>
+                <div class="tabContent tabText educationTab" id="EducationText" ><h1>EDUCATION</h1></div>
+                <div class="tabContent tabText generalTab" id="GeneralText" ><h1>GENERAL</h1></div>
+                <div class="tabContent tabText tabSelected welcomeTab" id="WelcomeText" ><h1>WELCOME</h1></div>
+            </div>
         </div>
     </div>
   </body>
