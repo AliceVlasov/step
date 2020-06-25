@@ -13,7 +13,7 @@ html, body {
 
 #header {
     background-color: azure;
-    height: 250px;
+    height: 25%;
 }
 
 #titleWrapper {
@@ -51,7 +51,7 @@ html, body {
 /* TAB PROPERTIES */
 
 #tabContent {
-    height: 100%;
+    height: 75%;
 }
 
 #pictureWrapper {
@@ -81,8 +81,10 @@ html, body {
 /* TAB IMAGE PROPERTIES */
 
 .tabPicture {
-    height: 300px;
-    width: 300px;
+    height: 70%;
+    width: 70%;
     background-size: cover;
-    margin-top: 50%;
+    background-position-y: center;
+    background-position-x: center;
+    align-self: center;
 }
