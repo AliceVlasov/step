@@ -17,8 +17,10 @@ html, body {
 }
 
 #titleWrapper {
-    height: 75%;  
-    text-align: center;
+    display: flex;
+    height: 75%;
+    align-items: center;
+    justify-content: center;
 }
 
 #title {
@@ -38,7 +40,10 @@ html, body {
     float: right;
     border-radius: 20% 20% 0 0;
     border: 1px solid black;
-    box-shadow: 8px -2px 10px -3px rgb(119, 101, 82)
+    box-shadow: 8px 0px 10px -3px rgb(119, 101, 82);
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
 .tabName {
@@ -50,12 +55,18 @@ html, body {
 
 .tab.tabHover {
     background-color:rgb(249, 200, 150);
+    display: flex;
+    align-items: center;
+    justify-content: center;
 
 }
 
 .tab.tabSelected {
     background-color: rgb(255, 212, 171);
     border-bottom: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
     
 }
 
@@ -64,10 +75,11 @@ html, body {
 #tabContent {
     height: 72%;
     background-color: rgb(255, 212, 171);
-    border-radius: 10px;
-    margin: 15px;
+    border-radius: 10px 0px 10px 10px;
+    margin: 18px;
     margin-top: 0;
-    border: 1px solid black
+    border: 1px solid black;
+    box-shadow: 8px -3px 10px -3px rgb(119, 101, 82);
 }
 
 #pictureWrapper {
