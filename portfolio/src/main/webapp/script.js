@@ -17,13 +17,23 @@ function toggleClass(obj, className, toAdd) {
 }
 
 function switchTabSelection(tabRemove, tabAdd) {
-    toggleClass(tabRemove, tabSelectedClass, false);
-    toggleClass(tabAdd, tabSelectedClass, true);
+    if (tabRemove === tabAdd) {
+        return;
+    }
 
+    contentRemove = document.querySelectorAll("[title="+tabRemove.getAttribute("title")+"]");
+    contentAdd = document.querySelectorAll("[title="+tabAdd.getAttribute("title")+"]");
+    
+    contentAdd.forEach(function(obj) {
+        toggleClass(obj, tabSelectedClass, true);
+    });
+    contentRemove.forEach(function(obj) {
+        toggleClass(obj, tabSelectedClass, false);
+    });
 }
 
 function prevSelectedTab() {
-    return document.getElementsByClassName(tabSelectedClass)[0];
+    return document.getElementsByClassName(tabClass+" "+tabSelectedClass)[0];
 }
 
 
@@ -52,3 +62,5 @@ function setUp() {
 
 const tabHoverClass = "tabHover";
 const tabSelectedClass = "tabSelected";
+const tabClass = "tab";
+const tabContentClass = "tabContent";
