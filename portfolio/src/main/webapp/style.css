@@ -3,6 +3,7 @@
 html, body {
     height: 100%;
     margin: 0;
+    background-color: azure;
 }
 
 #content {
@@ -12,12 +13,17 @@ html, body {
 /* HEADER PROPERTIES */
 
 #header {
-    background-color: azure;
     height: 25%;
 }
 
 #titleWrapper {
-    height: 75%;
+    height: 75%;  
+    text-align: center;
+}
+
+#title {
+    font-size: 8em;
+    margin: 0;
 }
 
 #tabSelector {
@@ -26,13 +32,13 @@ html, body {
 }
 
 .tab {
-    background-color: aliceblue;
+    background-color:rgb(242, 183, 125);
     width: 15%;
     height: 100%;
     float: right;
     border-radius: 20% 20% 0 0;
     border: 1px solid black;
-    box-shadow: 8px -1px 8px 2px grey;
+    box-shadow: 8px -2px 10px -3px rgb(119, 101, 82)
 }
 
 .tabName {
@@ -42,8 +48,13 @@ html, body {
     font-weight: 600;
 }
 
-.tab.tabSelected, .tab.tabHover {
-    background-color: lightpink;
+.tab.tabHover {
+    background-color:rgb(249, 200, 150);
+
+}
+
+.tab.tabSelected {
+    background-color: rgb(255, 212, 171);
     border-bottom: 0;
     
 }
@@ -51,11 +62,15 @@ html, body {
 /* TAB PROPERTIES */
 
 #tabContent {
-    height: 75%;
+    height: 72%;
+    background-color: rgb(255, 212, 171);
+    border-radius: 10px;
+    margin: 15px;
+    margin-top: 0;
+    border: 1px solid black
 }
 
 #pictureWrapper {
-    background-color: cornsilk;
     display: flex;
     justify-content: center;
     float:left;
@@ -64,10 +79,11 @@ html, body {
 }
 
 #textWrapper {
-    background-color: honeydew;
+    display: flex;
     float:left;
     width: 60%;
     height: 100%;
+    padding-top: 10px
 }
 
 .tabContent {
@@ -78,8 +94,6 @@ html, body {
     display: block;
 }
 
-/* TAB IMAGE PROPERTIES */
-
 .tabPicture {
     height: 70%;
     width: 70%;
@@ -87,4 +101,13 @@ html, body {
     background-position-y: center;
     background-position-x: center;
     align-self: center;
+}
+
+.tabText {
+    width: 100%;
+}
+
+
+.tabText h1 {
+    text-align: center;
 }
