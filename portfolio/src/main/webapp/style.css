@@ -56,6 +56,8 @@ html, body {
 
 #pictureWrapper {
     background-color: cornsilk;
+    display: flex;
+    justify-content: center;
     float:left;
     width: 40%;
     height: 100%;
@@ -79,7 +81,8 @@ html, body {
 /* TAB IMAGE PROPERTIES */
 
 .tabPicture {
-    height: 200px;
-    width: 200px;
+    height: 300px;
+    width: 300px;
     background-size: cover;
+    margin-top: 50%;
 }
