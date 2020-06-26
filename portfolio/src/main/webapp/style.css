@@ -130,10 +130,10 @@ html, body {
 /* GALLERY PROPERTIES */
 
 #galleryWrapper {
-    margin: 40px;
-    width: 96%;
+    margin: 20px;
+    width: calc(100% - 40px);
     overflow-y: auto;
-    max-height: calc(100% - 40px);
+    max-height: calc(100% - 80px);
 }
 
 #galleryGrid {
@@ -142,8 +142,10 @@ html, body {
 }
 
 .grid-item {
-    border: 1px solid black;
-    height: 400px;
+    height: 500px;
     margin: 10px;
     background-size: cover;
+    background-position-y: center;
+    box-shadow: 10px 10px 10px -8px;
+    border-radius: 20px;
 }
