@@ -45,6 +45,7 @@ html, body {
     display: flex;
     align-items: center;
     justify-content: center;
+    font-size: 1.5em;
 }
 
 .tabName {
@@ -98,7 +99,6 @@ html, body {
     overflow-y: auto;
     width: 60%;
     height: 100%;
-    padding-top: 10px
 }
 
 .tabContent {
@@ -120,6 +120,14 @@ html, body {
 
 .tabText {
     width: 100%;
+    margin: 15%;
+    max-height: 70%;
+    overflow: auto;
+    font-size: 1.5em;
+}
+
+.tabText h1 {
+    text-align: center;
 }
 
 
@@ -187,4 +195,10 @@ html, body {
     display: flex;
     justify-content: center;
     align-items: center;
+}
+
+/* TAB CONTENT */
+
+.GroupContent {
+    display:none;
 }
