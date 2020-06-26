@@ -36,6 +36,20 @@ function prevSelectedTab() {
     return document.getElementsByClassName(tabClass+" "+tabSelectedClass)[0];
 }
 
+function toggleGallerySelection(showGallery) {
+    console.log("here");
+    var textWrapper = document.getElementById("textWrapper");
+    var pictureWrapper = document.getElementById("pictureWrapper");
+    if (showGallery) {
+        textWrapper.style.display = "none";
+        pictureWrapper.style.display = "none";
+
+    }
+    else {
+        textWrapper.style.display = "flex";
+        pictureWrapper.style.display = "flex";    
+    }
+}
 
 function setTabEvents(tabs) {
     var tab;
@@ -50,13 +64,19 @@ function setTabEvents(tabs) {
         });
 
         tab.addEventListener("click", function() {
+            if (prevSelectedTab().getAttribute("title") === galleryTitle) {
+                toggleGallerySelection(false);
+            }
+            else if (this.getAttribute("title") === galleryTitle) {
+                toggleGallerySelection(true);
+            }
             switchTabSelection(prevSelectedTab(), this);
         });
     }
 } // setTabEvents
 
 function setUp() {
-    var tabs = document.getElementsByClassName("tab");
+    var tabs = document.getElementsByClassName(tabClass);
     setTabEvents(tabs);
 }
 
@@ -64,3 +84,4 @@ const tabHoverClass = "tabHover";
 const tabSelectedClass = "tabSelected";
 const tabClass = "tab";
 const tabContentClass = "tabContent";
+const galleryTitle = "galleryTab";
