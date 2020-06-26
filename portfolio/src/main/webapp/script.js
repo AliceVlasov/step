@@ -37,13 +37,11 @@ function prevSelectedTab() {
 }
 
 function toggleGallerySelection(showGallery) {
-    console.log("here");
     var textWrapper = document.getElementById("textWrapper");
     var pictureWrapper = document.getElementById("pictureWrapper");
     if (showGallery) {
         textWrapper.style.display = "none";
         pictureWrapper.style.display = "none";
-
     }
     else {
         textWrapper.style.display = "flex";
