@@ -51,7 +51,8 @@ function toggleGallerySelection(showGallery) {
     }
 }
 
-function setTabEvents(tabs) {
+function setTabEvents() {
+    var tabs = document.getElementsByClassName(tabClass);
     var tab;
     for (var i = 0; i < tabs.length; i++) {
         tab = tabs[i];
@@ -75,6 +76,36 @@ function setTabEvents(tabs) {
     }
 } // setTabEvents
 
+function animate (obj, name) {
+    obj.style["animation-name"] = name;
+}
+
+// INFO FEATURES
+
+function getContent(header) {
+    return header.nextElementSibling;
+}
+
+function toggleGroupContent(header) {
+    var content = getContent(header);
+    if (content.style["animation-name"] === showName) {
+        animate(content, hideName);
+    }
+    else {
+        animate(content, showName);
+    }
+
+}
+
+function setInfoEvents() {
+    var infoHeaders = document.getElementsByClassName(groupHeader);
+    for (var i = 0; i < infoHeaders.length; i++) {
+        infoHeaders[i].addEventListener("click", function() {
+            toggleGroupContent(this);
+        });
+    }
+
+}
 
 // GALLERY FEATURES
 
@@ -84,10 +115,10 @@ function getCaption(galleryPic) {
 
 function fadeAnimation(caption, fadeIn) {
     if (fadeIn) {
-        caption.style["animation-name"] = fadeInName;
+        animate(caption, fadeInName);
     }
     else {
-        caption.style["animation-name"] = fadeOutName;
+        animate(caption, fadeOutName);
     }
 }
 
@@ -96,7 +127,8 @@ function fadeCaption(pic, fadeIn) {
     fadeAnimation(caption, fadeIn);
 }
 
-function setGalleryEvents(galleryPics) {
+function setGalleryEvents() {
+    var galleryPics = document.getElementsByClassName(galleryPicClass);
     var pic;
     for (var i = 0; i < galleryPics.length; i++) {
         pic = galleryPics[i];
@@ -111,10 +143,9 @@ function setGalleryEvents(galleryPics) {
 
 
 function setUp() {
-    var tabs = document.getElementsByClassName(tabClass);
-    setTabEvents(tabs);
-    var galleryPics = document.getElementsByClassName(galleryPicClass);
-    setGalleryEvents(galleryPics);
+    setTabEvents();
+    setGalleryEvents();
+    setInfoEvents();
 }
 
 const tabHoverClass = "tabHover";
@@ -122,7 +153,13 @@ const tabSelectedClass = "tabSelected";
 const tabClass = "tab";
 const tabContentClass = "tabContent";
 const galleryTitle = "galleryTab";
+
 const galleryPicClass = "gridItem"
 const fadeInName = "fadeIn";
 const fadeOutName = "fadeOut";
 const captionClass = "caption";
+
+const groupHeader = "groupHeader";
+const groupText = "groupText";
+const showName = "collapseShow";
+const hideName = "collapseHide";
