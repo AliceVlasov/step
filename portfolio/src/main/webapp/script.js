@@ -76,45 +76,9 @@ function setTabEvents(tabs) {
 } // setTabEvents
 
 
-// GALLERY FEATURES
-
-function getCaption(galleryPic) {
-    return galleryPic.childNodes[1];
-}
-
-function fadeAnimation(caption, fadeIn) {
-    if (fadeIn) {
-        caption.style["animation-name"] = fadeInName;
-    }
-    else {
-        caption.style["animation-name"] = fadeOutName;
-    }
-}
-
-function fadeCaption(pic, fadeIn) {
-    var caption = getCaption(pic);
-    fadeAnimation(caption, fadeIn);
-}
-
-function setGalleryEvents(galleryPics) {
-    var pic;
-    for (var i = 0; i < galleryPics.length; i++) {
-        pic = galleryPics[i];
-        pic.addEventListener("mouseover", function() {
-            fadeCaption(this, true);
-        });
-        pic.addEventListener("mouseout", function() {
-            fadeCaption(this, false);
-        });
-    }
-}
-
-
 function setUp() {
     var tabs = document.getElementsByClassName(tabClass);
     setTabEvents(tabs);
-    var galleryPics = document.getElementsByClassName(galleryPicClass);
-    setGalleryEvents(galleryPics);
 }
 
 const tabHoverClass = "tabHover";
@@ -122,7 +86,3 @@ const tabSelectedClass = "tabSelected";
 const tabClass = "tab";
 const tabContentClass = "tabContent";
 const galleryTitle = "galleryTab";
-const galleryPicClass = "gridItem"
-const fadeInName = "fadeIn";
-const fadeOutName = "fadeOut";
-const captionClass = "caption";
