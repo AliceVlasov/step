@@ -3,6 +3,7 @@
 html, body {
     height: 100%;
     margin: 0;
+    background-color: azure;
 }
 
 #content {
@@ -12,12 +13,19 @@ html, body {
 /* HEADER PROPERTIES */
 
 #header {
-    background-color: azure;
-    height: 250px;
+    height: 25%;
 }
 
 #titleWrapper {
+    display: flex;
     height: 75%;
+    align-items: center;
+    justify-content: center;
+}
+
+#title {
+    font-size: 8em;
+    margin: 0;
 }
 
 #tabSelector {
@@ -32,13 +40,16 @@ html, body {
 }
 
 .tab {
-    background-color: aliceblue;
+    background-color:rgb(242, 183, 125);
     width: calc(20% - 2px);
     height: 100%;
     float: left;
     border-radius: 20% 20% 0 0;
     border: 1px solid black;
-    box-shadow: 8px -1px 8px 2px grey;
+    box-shadow: 8px 0px 10px -3px rgb(119, 101, 82);
+    display: flex;
+    align-items: center;
+    justify-content: center;
     cursor: pointer;
 }
 
@@ -49,30 +60,72 @@ html, body {
     font-weight: 600;
 }
 
-.tabSelected, .tab:hover {
-    background-color: lightpink;
+.tab:hover {
+    background-color:rgb(249, 200, 150);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.tab.tabSelected {
+    background-color: rgb(255, 212, 171);
     border-bottom: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
     
 }
 
 /* TAB PROPERTIES */
 
 #tabContent {
-    height: 100%;
+    height: 72%;
+    background-color: rgb(255, 212, 171);
+    border-radius: 10px 0px 10px 10px;
+    margin: 18px;
+    margin-top: 0;
+    border: 1px solid black;
+    box-shadow: 8px -3px 10px -3px rgb(119, 101, 82);
 }
 
 #pictureWrapper {
-    background-color: cornsilk;
+    display: flex;
+    justify-content: center;
     float:left;
     width: 40%;
     height: 100%;
-
 }
 
 #textWrapper {
-    background-color: honeydew;
+    display: flex;
     float:left;
     width: 60%;
     height: 100%;
+    padding-top: 10px
 }
 
+.tabContent {
+    display: none;
+}
+
+.tabSelected {
+    display: block;
+}
+
+.tabPicture {
+    height: 70%;
+    width: 70%;
+    background-size: cover;
+    background-position-y: center;
+    background-position-x: center;
+    align-self: center;
+}
+
+.tabText {
+    width: 100%;
+}
+
+
+.tabText h1 {
+    text-align: center;
+}

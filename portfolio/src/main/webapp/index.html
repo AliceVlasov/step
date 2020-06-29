@@ -9,12 +9,15 @@
         document.addEventListener('DOMContentLoaded', function() {
             setUp();
         }, false);   
-    } </script>
+    } 
+    </script>
   </head>
   <body>
     <div id="content">
         <header id="header">
-            <div id="titleWrapper"></div>
+            <div id="titleWrapper">
+                <h1 id="title"> My Portfolio</h1>
+            </div>
             <div id="tabSelector">
                 <div id="tabs">
                     <div role="button" class="tab tabSelected" id="Welcome"><p class="tabName">Welcome</p></div>
@@ -26,8 +29,33 @@
             </div> 
         </header>
         <div id="tabContent">
-            <div id="pictureWrapper"></div>
-            <div id="textWrapper"></div>
+            <div id="pictureWrapper">
+                    <div title="projectsTab"  style="background-image: url('images/Projects.jpg')"  class="tabContent tabPicture" > </div> 
+                    <div title="educationTab" style="background-image: url('images/Education.jpg')" class="tabContent tabPicture"> </div>
+                    <div title="generalTab"   style="background-image: url('images/General.jpg')"   class="tabContent tabPicture"> </div>
+                    <div title="welcomeTab"   style="background-image: url('images/Alice.jpg')"     class="tabContent tabPicture tabSelected"> </div>
+            </div>
+            <div id="textWrapper">
+                <div title="galleryTab"   class="tabContent tabText">
+                    <h1>GALLERY</h1>
+                </div>
+
+                <div title="projectsTab"  class="tabContent tabText">             
+                    <h1>PROJECTS</h1>  
+                </div>
+
+                <div title="educationTab" class="tabContent tabText">             
+                    <h1>EDUCATION</h1> 
+                </div>
+
+                <div title="generalTab"   class="tabContent tabText">             
+                    <h1>GENERAL</h1>   
+                </div>
+
+                <div title="welcomeTab"   class="tabContent tabText tabSelected"> 
+                    <h1>WELCOME</h1>   
+                </div>
+            </div>
         </div>
     </div>
   </body>
