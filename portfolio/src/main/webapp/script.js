@@ -12,6 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+// TAB FEATURES
+
 function toggleClass(obj, className, toAdd) {
     toAdd? obj.classList.add(className): obj.classList.remove(className);
 }
@@ -36,19 +38,38 @@ function prevSelectedTab() {
     return document.getElementsByClassName(tabClass+" "+tabSelectedClass)[0];
 }
 
+function toggleGallerySelection(showGallery) {
+    var textWrapper = document.getElementById("textWrapper");
+    var pictureWrapper = document.getElementById("pictureWrapper");
+    if (showGallery) {
+        textWrapper.style.display = "none";
+        pictureWrapper.style.display = "none";
+    }
+    else {
+        textWrapper.style.display = "flex";
+        pictureWrapper.style.display = "flex";    
+    }
+}
 
 function setTabEvents(tabs) {
     var tab;
     for (var i = 0; i < tabs.length; i++) {
         tab = tabs[i];
         tab.addEventListener("click", function() {
+            if (prevSelectedTab().getAttribute("title") === galleryTitle) {
+                toggleGallerySelection(false);
+            }
+            else if (this.getAttribute("title") === galleryTitle) {
+                toggleGallerySelection(true);
+            }
             switchTabSelection(prevSelectedTab(), this);
         });
     }
 } // setTabEvents
 
+
 function setUp() {
-    var tabs = document.getElementsByClassName("tab");
+    var tabs = document.getElementsByClassName(tabClass);
     setTabEvents(tabs);
 }
 
@@ -56,3 +77,4 @@ function setUp() {
 const tabSelectedClass = "tabSelected";
 const tabClass = "tab";
 const tabContentClass = "tabContent";
+const galleryTitle = "galleryTab";
