@@ -31,14 +31,6 @@ function setTabEvents(tabs) {
     var tab;
     for (var i = 0; i < tabs.length; i++) {
         tab = tabs[i];
-        tab.addEventListener("mouseover", function() {
-            toggleClass(this, tabHoverClass, true);
-        });
-
-        tab.addEventListener("mouseout", function() {
-            toggleClass(this, tabHoverClass, false);
-        });
-
         tab.addEventListener("click", function() {
             switchTabSelection(prevSelectedTab(), this);
         });
@@ -50,5 +42,4 @@ function setUp() {
     setTabEvents(tabs);
 }
 
-const tabHoverClass = "tabHover";
 const tabSelectedClass = "tabSelected";

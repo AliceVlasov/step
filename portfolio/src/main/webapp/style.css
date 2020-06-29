@@ -42,7 +42,7 @@ html, body {
     font-weight: 600;
 }
 
-.tabSelected, .tabHover {
+.tabSelected, .tab:hover {
     background-color: lightpink;
     border-bottom: 0;
     
