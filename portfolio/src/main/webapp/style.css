@@ -1,16 +1,78 @@
+/* GENERAL PROPERTIES */
+
+html, body {
+    height: 100%;
+    margin: 0;
+}
+
 #content {
-  margin-left: auto;
-  margin-right: auto;
-  width: 650px;
+    height: 100%;
 }
 
-#greeting-container {
-  margin-top: 20px;
+/* HEADER PROPERTIES */
+
+#header {
+    background-color: azure;
+    height: 250px;
 }
 
-#profile {
-    height: 200px;
-    width: 200px;
-    object-fit:contain;
-    object-position: left;
+#titleWrapper {
+    height: 75%;
 }
+
+#tabSelector {
+    height: 25%;
+}
+
+#tabs {
+    float: right;
+    margin-right: 18px;
+    height: calc(100% - 2px);
+    width: 75%;
+}
+
+.tab {
+    background-color: aliceblue;
+    width: calc(20% - 2px);
+    height: 100%;
+    float: left;
+    border-radius: 20% 20% 0 0;
+    border: 1px solid black;
+    box-shadow: 8px -1px 8px 2px grey;
+    cursor: pointer;
+}
+
+.tabName {
+    text-align: center;
+    top: 50%;
+    bottom: 50%;
+    font-weight: 600;
+}
+
+.tabSelected, .tab:hover {
+    background-color: lightpink;
+    border-bottom: 0;
+    
+}
+
+/* TAB PROPERTIES */
+
+#tabContent {
+    height: 100%;
+}
+
+#pictureWrapper {
+    background-color: cornsilk;
+    float:left;
+    width: 40%;
+    height: 100%;
+
+}
+
+#textWrapper {
+    background-color: honeydew;
+    float:left;
+    width: 60%;
+    height: 100%;
+}
+
