@@ -22,14 +22,20 @@ html, body {
 
 #tabSelector {
     height: 25%;
+}
+
+#tabs {
+    float: right;
     margin-right: 18px;
+    height: calc(100% - 2px);
+    width: 75%;
 }
 
 .tab {
     background-color: aliceblue;
-    width: 15%;
+    width: calc(20% - 2px);
     height: 100%;
-    float: right;
+    float: left;
     border-radius: 20% 20% 0 0;
     border: 1px solid black;
     box-shadow: 8px -1px 8px 2px grey;
