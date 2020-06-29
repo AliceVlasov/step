@@ -30,20 +30,27 @@ html, body {
 
 #tabSelector {
     height: 25%;
+}
+
+#tabs {
+    float: right;
     margin-right: 18px;
+    height: calc(100% - 2px);
+    width: 75%;
 }
 
 .tab {
     background-color:rgb(242, 183, 125);
-    width: 15%;
+    width: calc(20% - 2px);
     height: 100%;
-    float: right;
+    float: left;
     border-radius: 20% 20% 0 0;
     border: 1px solid black;
     box-shadow: 8px 0px 10px -3px rgb(119, 101, 82);
     display: flex;
     align-items: center;
     justify-content: center;
+    cursor: pointer;
 }
 
 .tabName {
@@ -53,12 +60,11 @@ html, body {
     font-weight: 600;
 }
 
-.tab.tabHover {
+.tab:hover {
     background-color:rgb(249, 200, 150);
     display: flex;
     align-items: center;
     justify-content: center;
-
 }
 
 .tab.tabSelected {
