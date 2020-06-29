@@ -33,6 +33,7 @@ html, body {
     border-radius: 20% 20% 0 0;
     border: 1px solid black;
     box-shadow: 8px -1px 8px 2px grey;
+    cursor: pointer;
 }
 
 .tabName {
