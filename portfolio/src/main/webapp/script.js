@@ -51,7 +51,8 @@ function toggleGallerySelection(showGallery) {
     }
 }
 
-function setTabEvents(tabs) {
+function setTabEvents() {
+    var tabs = document.getElementsByClassName(tabClass);
     var tab;
     for (var i = 0; i < tabs.length; i++) {
         tab = tabs[i];
@@ -67,14 +68,40 @@ function setTabEvents(tabs) {
     }
 } // setTabEvents
 
+// INFO FEATURES
 
-function setUp() {
-    var tabs = document.getElementsByClassName(tabClass);
-    setTabEvents(tabs);
+function getContent(header) {
+    return header.nextElementSibling;
 }
 
+function toggleGroupContent(header) {
+    var content = getContent(header);
+    
+    header.classList.toggle("active");
+    if (content.style.maxHeight) {
+        content.style.maxHeight = null;
+    } else {
+        content.style.maxHeight = content.scrollHeight + "px";
+    }
+}
+
+function setInfoEvents() {
+    var infoHeaders = document.getElementsByClassName(groupHeader);
+    for (var i = 0; i < infoHeaders.length; i++) {
+        infoHeaders[i].addEventListener("click", function() {
+            toggleGroupContent(this);
+        });
+    }
+
+}
+
+function setUp() {
+    setTabEvents();
+    setInfoEvents();
+}
 
 const tabSelectedClass = "tabSelected";
 const tabClass = "tab";
 const tabContentClass = "tabContent";
 const galleryTitle = "galleryTab";
+const groupHeader = "groupHeader";

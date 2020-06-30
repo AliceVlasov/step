@@ -36,7 +36,7 @@ html, body {
 #tabs {
     float: right;
     margin-right: 18px;
-    height: calc(100% - 2px);
+    height: 100%;
     width: 75%;
 }
 
@@ -51,7 +51,9 @@ html, body {
     display: flex;
     align-items: center;
     justify-content: center;
+    font-size: 1.5em;
     cursor: pointer;
+    transition: background-color 0.2s;
 }
 
 .tabName {
@@ -104,7 +106,6 @@ html, body {
     overflow-y: auto;
     width: 60%;
     height: 100%;
-    padding-top: 10px
 }
 
 .tabContent {
@@ -122,15 +123,22 @@ html, body {
     background-position-y: center;
     background-position-x: center;
     align-self: center;
+    box-shadow: 10px 10px 10px -8px;
+    border-radius: 20px;
 }
 
 .tabText {
     width: 100%;
+    margin: 15%;
+    max-height: 70%;
+    overflow-y: auto;
+    overflow-x: hidden;
+    font-size: 1.5em;
 }
-
 
 .tabText h1 {
     text-align: center;
+    margin-left: 10px;
 }
 
 /* GALLERY PROPERTIES */
@@ -175,4 +183,39 @@ html, body {
     transition: background-color 0.5s, color 0.5s;
     background-color: rgba(217, 218, 219, 0);
     color: rgba(0, 0, 0, 0);
+}
+
+/* TAB CONTENT */
+
+.groupContent {
+    max-height: 0;
+    padding-left: 20px;
+    padding-right: 40px;
+    overflow: hidden;
+    transition: max-height 0.5s;
+}
+
+.groupHeader {
+    margin-right: 20px;
+    padding-left: 10px;
+    background-color: #e68b1a;
+    border-color: #e68b1a;
+    box-shadow: 5px 5px 10px -2px;
+    border-radius: 20px;
+    transition: background-color 0.5s, border-color 0.5s;
+    width: 95%;
+    margin-left: 10px;
+    font-size: 1.2em;
+    min-height: 3.5em;
+    outline: 0;
+}
+
+.groupHeader:hover, .active{
+    background-color: #f3ad56;
+    border-color: #f3ad56;
+    outline: 0;
+}
+
+#accordion {
+    margin-bottom: 20px;
 }
