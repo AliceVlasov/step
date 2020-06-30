@@ -56,14 +56,6 @@ function setTabEvents() {
     var tab;
     for (var i = 0; i < tabs.length; i++) {
         tab = tabs[i];
-        tab.addEventListener("mouseover", function() {
-            toggleClass(this, tabHoverClass, true);
-        });
-
-        tab.addEventListener("mouseout", function() {
-            toggleClass(this, tabHoverClass, false);
-        });
-
         tab.addEventListener("click", function() {
             if (prevSelectedTab().getAttribute("title") === galleryTitle) {
                 toggleGallerySelection(false);
@@ -75,10 +67,6 @@ function setTabEvents() {
         });
     }
 } // setTabEvents
-
-function animate (obj, name) {
-    obj.style["animation-name"] = name;
-}
 
 // INFO FEATURES
 
@@ -107,56 +95,13 @@ function setInfoEvents() {
 
 }
 
-// GALLERY FEATURES
-
-function getCaption(galleryPic) {
-    return galleryPic.childNodes[1];
-}
-
-function fadeAnimation(caption, fadeIn) {
-    if (fadeIn) {
-        animate(caption, fadeInName);
-    }
-    else {
-        animate(caption, fadeOutName);
-    }
-}
-
-function fadeCaption(pic, fadeIn) {
-    var caption = getCaption(pic);
-    fadeAnimation(caption, fadeIn);
-}
-
-function setGalleryEvents() {
-    var galleryPics = document.getElementsByClassName(galleryPicClass);
-    var pic;
-    for (var i = 0; i < galleryPics.length; i++) {
-        pic = galleryPics[i];
-        pic.addEventListener("mouseover", function() {
-            fadeCaption(this, true);
-        });
-        pic.addEventListener("mouseout", function() {
-            fadeCaption(this, false);
-        });
-    }
-}
-
-
 function setUp() {
     setTabEvents();
-    setGalleryEvents();
     setInfoEvents();
 }
 
-const tabHoverClass = "tabHover";
 const tabSelectedClass = "tabSelected";
 const tabClass = "tab";
 const tabContentClass = "tabContent";
 const galleryTitle = "galleryTab";
-
-const galleryPicClass = "gridItem"
-const fadeInName = "fadeIn";
-const fadeOutName = "fadeOut";
-const captionClass = "caption";
-
 const groupHeader = "groupHeader";
