@@ -23,8 +23,8 @@ function switchTabSelection(tabRemove, tabAdd) {
         return;
     }
 
-    contentRemove = document.querySelectorAll("[title="+tabRemove.getAttribute("title")+"]");
-    contentAdd = document.querySelectorAll("[title="+tabAdd.getAttribute("title")+"]");
+    contentRemove = document.querySelectorAll("[title="+"\""+tabRemove.getAttribute("title")+"\""+"]");
+    contentAdd = document.querySelectorAll("[title="+"\""+tabAdd.getAttribute("title")+"\""+"]");
     
     contentAdd.forEach(function(obj) {
         toggleClass(obj, tabSelectedClass, true);
