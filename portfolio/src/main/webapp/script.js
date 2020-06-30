@@ -88,13 +88,13 @@ function getContent(header) {
 
 function toggleGroupContent(header) {
     var content = getContent(header);
-    if (content.style["animation-name"] === showName) {
-        animate(content, hideName);
+    
+    header.classList.toggle("active");
+    if (content.style.maxHeight) {
+        content.style.maxHeight = null;
+    } else {
+        content.style.maxHeight = content.scrollHeight + "px";
     }
-    else {
-        animate(content, showName);
-    }
-
 }
 
 function setInfoEvents() {
@@ -160,6 +160,3 @@ const fadeOutName = "fadeOut";
 const captionClass = "caption";
 
 const groupHeader = "groupHeader";
-const groupText = "groupText";
-const showName = "collapseShow";
-const hideName = "collapseHide";
