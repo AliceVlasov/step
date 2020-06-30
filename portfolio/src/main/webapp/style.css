@@ -65,17 +65,17 @@ html, body {
 
 .tab:hover {
     background-color:rgb(249, 200, 150);
-    /* display: flex;
+    display: flex;
     align-items: center;
-    justify-content: center; */
+    justify-content: center;
 }
 
 .tab.tabSelected {
     background-color: rgb(255, 212, 171);
     border-bottom: 0;
-    /* display: flex;
+    display: flex;
     align-items: center;
-    justify-content: center; */
+    justify-content: center;
     
 }
 
