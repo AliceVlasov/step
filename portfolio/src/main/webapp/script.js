@@ -111,23 +111,35 @@ const groupHeader = "groupHeader";
 /**
  * Fetches a message from the server and adds it to the DOM
  */
-function getMessage() {
-  const message = fetch('/data');
-  message.then(handleGivenMessage);
+function getComments() {
+  const comments = fetch('/data');
+  comments.then(response => response.json())
+          .then((objects) => { 
+            handleGivenComments(objects)
+          });
 }
 
 /**
- * Handles the message from the server by converting it to text and giving it to addNameToDom()
+ * Handles the comments from the server by converting them to text and giving them to addNameToDom()
  */
-function handleGivenMessage(givenMessage) {
-  const messageText = givenMessage.text();
-  messageText.then(addMessageToDom);
+function handleGivenComments(comments) {
+  for (const comment of comments) {
+    addCommentToDom(comment);
+  }
 }
 
 /**
- * Adds the message to the welcome tab
+ * Adds the comment to the page
  */
-function addMessageToDom(message) {
-  const messageContainer = document.getElementById('serverMessage');
-  messageContainer.innerText = message;
+function addCommentToDom(comment) {
+  const commentSection = document.getElementById("commentsSection");
+
+  //make new objects to contain the comment
+  const commentObj = document.createElement("div");
+  const commentText = document.createElement("p");
+  commentText.innerText = comment;
+
+  // add the new objects to the comment section
+  commentObj.appendChild(commentText);
+  commentSection.appendChild(commentObj);
 }
