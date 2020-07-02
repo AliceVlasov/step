@@ -12,7 +12,7 @@
     } 
     </script>
   </head>
-  <body>
+  <body onload="getMessage()">
     <div id="content">
         <header id="header">
             <div id="titleWrapper">
@@ -207,7 +207,8 @@
                 </div>
 
                 <div title="Welcome Tab"   class="tabContent tabText tabSelected"> 
-                    <h1>HELLO</h1>  
+                    <h1>HELLO</h1>
+                    <p id="serverMessage"></p>
                     <p>Welcome to my portfolio!</p>
                     <p>Checkout the tabs to learn a bit about me :D, and be sure to scroll through the gallery to see some of my favourite photos from the last few years!</p>
                 </div>

@@ -105,3 +105,29 @@ const tabClass = "tab";
 const tabContentClass = "tabContent";
 const galleryTitle = "galleryTab";
 const groupHeader = "groupHeader";
+
+// Servlet functions
+
+/**
+ * Fetches a message from the server and adds it to the DOM
+ */
+function getMessage() {
+  const message = fetch('/data');
+  message.then(handleGivenMessage);
+}
+
+/**
+ * Handles the message from the server by converting it to text and giving it to addNameToDom()
+ */
+function handleGivenMessage(givenMessage) {
+  const messageText = givenMessage.text();
+  messageText.then(addMessageToDom);
+}
+
+/**
+ * Adds the message to the welcome tab
+ */
+function addMessageToDom(message) {
+  const messageContainer = document.getElementById('serverMessage');
+  messageContainer.innerText = message;
+}
