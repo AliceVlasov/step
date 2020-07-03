@@ -38,7 +38,7 @@ function prevSelectedTab() {
     return document.getElementsByClassName(tabClass+" "+tabSelectedClass)[0];
 }
 
-function toggleGallerySelection(showGallery) {
+function toggleSpecialTab(showGallery) {
     var textWrapper = document.getElementById("textWrapper");
     var pictureWrapper = document.getElementById("pictureWrapper");
     if (showGallery) {
@@ -57,11 +57,11 @@ function setTabEvents() {
     for (var i = 0; i < tabs.length; i++) {
         tab = tabs[i];
         tab.addEventListener("click", function() {
-            if (prevSelectedTab().getAttribute("title") === galleryTitle) {
-                toggleGallerySelection(false);
+            if (prevSelectedTab().classList.contains(SPECIAL_TAB)) {
+                toggleSpecialTab(false);
             }
-            else if (this.getAttribute("title") === galleryTitle) {
-                toggleGallerySelection(true);
+            if (this.classList.contains(SPECIAL_TAB)) {
+                toggleSpecialTab(true);
             }
             switchTabSelection(prevSelectedTab(), this);
         });
@@ -103,7 +103,7 @@ function setUp() {
 const tabSelectedClass = "tabSelected";
 const tabClass = "tab";
 const tabContentClass = "tabContent";
-const galleryTitle = "galleryTab";
+const SPECIAL_TAB = "special";
 const groupHeader = "groupHeader";
 
 // Servlet functions

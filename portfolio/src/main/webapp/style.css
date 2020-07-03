@@ -41,7 +41,7 @@ html, body {
 
 .tab {
     background-color:rgb(242, 183, 125);
-    width: calc(20% - 2px);
+    width: calc((100% / 6) - 2px);
     height: 100%;
     float: left;
     border-radius: 20% 20% 0 0;

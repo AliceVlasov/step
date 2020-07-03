@@ -24,7 +24,8 @@
                     <div role="button" title="General Tab" class="tab" id="General"><p class="tabName">General</p></div>
                     <div role="button" title="Education Tab" class="tab" id="Education"><p class="tabName">Education</p></div>
                     <div role="button" title="Projects Tab" class="tab" id="Projects"><p class="tabName">Projects</p></div>
-                    <div role="button" title="Gallery Tab" class="tab" id="Gallery"><p class="tabName">Gallery</p> </div>
+                    <div role="button" title="Gallery Tab" class="tab special" id="Gallery"><p class="tabName">Gallery</p> </div>
+                    <div role="button" title="Comments Tab" class="tab special" id="Comments"><p class="tabName">Comments</p> </div>
                 </div>
             </div> 
         </header>
@@ -213,7 +214,7 @@
                 </div>
             </div>
             
-            <div id="galleryWrapper" title="galleryTab" class="tabContent">
+            <div id="galleryWrapper" title="Gallery Tab" class="tabContent">
                 <div id="galleryGrid">
                     <div class="gridItem" style="background-image: url('images/gallery/home-1.jpg')">
                         <div class="caption"> 
@@ -302,14 +303,17 @@
                     </div>
                 </div>
             </div>
+            <div id="commentsWrapper" title="Comments Tab" class="tabContent">
+              <div id="commentsSection">
+                <form id="commentForm" action="/data" method="POST">
+                  <label for="inputComment">Enter your comment</label><br>
+                  <input id="inputComment" type="text" name="comment-text"><br>
+                  <input id="submitBtn" type="submit" value="Submit"><br>
+                </form>
+              </div>
+            </div>
         </div>
     </div>
-    <div id="commentsSection">
-      <form id="commentForm" action="/data" method="POST">
-        <label for="inputComment">Enter your comment</label><br>
-        <input id="inputComment" type="text" name="comment-text"><br>
-        <input id="submitBtn" type="submit" value="Submit"><br>
-      </form>
-    </div>
+
   </body>
 </html>
