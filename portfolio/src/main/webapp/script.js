@@ -112,10 +112,9 @@ const groupHeader = "groupHeader";
  * Fetches a message from the server and adds it to the DOM
  */
 function getComments() {
-  const comments = fetch('/data');
-  comments.then(response => response.json())
-          .then((objects) => { 
-            handleGivenComments(objects)
+  const comments = fetch("/data");
+  comments.then(response => response.json()).then((list) => { 
+            handleGivenComments(list)
           });
 }
 
