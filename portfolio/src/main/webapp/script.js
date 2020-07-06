@@ -98,6 +98,11 @@ function setInfoEvents() {
 function setUp() {
     setTabEvents();
     setInfoEvents();
+    getComments();
+    // setFormSubmit();
+
+    // var postTarget = document.getElementById("submitTarget");
+    // postTarget.onload = onLoadPost;
 }
 
 const tabSelectedClass = "tabSelected";
@@ -122,7 +127,7 @@ function getComments() {
  * Handles the comments from the server by converting them to text and giving them to addNameToDom()
  */
 function handleGivenComments(comments) {
-  for (const comment of comments) {
+  for (var comment of comments) {
     addCommentToDom(comment);
   }
 }
@@ -132,13 +137,43 @@ function handleGivenComments(comments) {
  */
 function addCommentToDom(comment) {
   const commentSection = document.getElementById("commentsSection");
-
-  //make new objects to contain the comment
-  const commentObj = document.createElement("div");
-  const commentText = document.createElement("p");
-  commentText.innerText = comment;
+  const obj = makeCommentElement(comment, "Alice");
 
   // add the new objects to the comment section
-  commentObj.appendChild(commentText);
-  commentSection.appendChild(commentObj);
+  commentSection.appendChild(obj);
+}
+
+/**
+ * @return HTML div object containing the comment with relevant information and styling
+ */
+function makeCommentElement(text, author) {
+  const commentObj = document.createElement("div");
+  commentObj.classList.add("comment")
+  
+  commentObj.appendChild(makeCommentAuthorElement(author));
+  commentObj.appendChild(makeCommentTextElement(text));
+
+  return commentObj;
+}
+
+/**
+ * @return HTML paragraph containing the comment text
+ */
+function makeCommentTextElement(text) {
+  const commentText = document.createElement("p");
+  commentText.innerText = text;
+  commentText.classList.add("commentText");
+
+  return commentText;
+}
+
+/**
+ * @return HTML paragraph containing the author's name
+ */
+function makeCommentAuthorElement(author) {
+  const commentAuthor = document.createElement("p");
+  commentAuthor.innerText = author;
+  commentAuthor.classList.add("commentAuthor");
+
+  return commentAuthor;
 }

@@ -12,7 +12,7 @@
     } 
     </script>
   </head>
-  <body onload="getComments()">
+  <body>
     <div id="content">
         <header id="header">
             <div id="titleWrapper">
@@ -305,15 +305,14 @@
             </div>
             <div id="commentsWrapper" title="Comments Tab" class="tabContent">
               <div id="commentsSection">
-                <form id="commentForm" action="/data" method="POST">
-                  <label for="inputComment">Enter your comment</label><br>
-                  <input id="inputComment" type="text" name="comment-text"><br>
+                <h1>Share your thoughts!</h1>
+                <form id="commentForm" action="/data" method="POST" target="submitTarget">
+                  <input id="inputComment" type="text" name="comment-text" value="Write a comment"><br>
                   <input id="submitBtn" type="submit" value="Submit"><br>
                 </form>
               </div>
             </div>
         </div>
     </div>
-
   </body>
 </html>

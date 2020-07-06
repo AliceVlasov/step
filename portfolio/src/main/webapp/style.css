@@ -87,6 +87,7 @@ html, body {
     border-radius: 10px 0px 10px 10px;
     margin: 18px;
     margin-top: 0;
+    overflow: hidden;
     border: 1px solid black;
     box-shadow: 8px -3px 10px -3px rgb(119, 101, 82);
 }
@@ -146,7 +147,7 @@ html, body {
     margin: 20px;
     width: calc(100% - 40px);
     overflow-y: auto;
-    max-height: calc(100% - 80px);
+    max-height: calc(100% - 40px);
 }
 
 #galleryGrid {
@@ -217,4 +218,35 @@ html, body {
 
 #accordion {
     margin-bottom: 20px;
+}
+
+/* COMMENTS */
+
+#commentsSection {
+  font-size: 1.5em;
+  margin: 5% 10% 5% 10%;
+  max-height: 90%;
+}
+
+#commentsSection h1 {
+  text-align: center;
+  font-size: 3em;
+}
+
+#commentForm {
+  margin-bottom: 20px;
+}
+
+#inputComment {
+  width: 80%;
+  border-radius: 20px;
+  height: 40px;
+}
+
+.comment {
+  background-color: rgba(226, 179, 136, .7);
+  border: 1px solid black;
+  border-radius: 10px;
+  box-shadow: 5px 5px 10px -2px;
+  margin: 20px;
 }
