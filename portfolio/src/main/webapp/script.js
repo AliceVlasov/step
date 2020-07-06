@@ -117,9 +117,9 @@ const groupHeader = "groupHeader";
  * Fetches a message from the server and adds it to the DOM
  */
 function getComments() {
-  const comments = fetch("/data");
-  comments.then(response => response.json()).then((list) => { 
-            handleGivenComments(list)
+  const comments = fetch("/list-comments");
+  comments.then(response => response.json()).then((comments) => { 
+            handleGivenComments(comments)
           });
 }
 
@@ -142,7 +142,7 @@ const COMMENTS_DISPLAY = "commentsDisplay";
  */
 function addCommentToDom(comment) {
   const commentDisplay = document.getElementById(COMMENTS_DISPLAY);
-  const obj = makeCommentElement(comment, "Alice");
+  const obj = makeCommentElement(comment, comment.commentText, "Alice");
 
   // add the new objects to the comment Display
   commentDisplay.appendChild(obj);
@@ -151,7 +151,7 @@ function addCommentToDom(comment) {
 /**
  * @return HTML div object containing the comment with relevant information and styling
  */
-function makeCommentElement(text, author) {
+function makeCommentElement(comment, text, author) {
   const commentObj = document.createElement("div");
 
   /**Class name to style all comment blocks */
@@ -161,8 +161,20 @@ function makeCommentElement(text, author) {
   
   commentObj.appendChild(makeCommentTextElement(text));
   commentObj.appendChild(makeCommentAuthorElement(author));
+  commentObj.appendChild(makeDeleteButton(comment, commentObj));
 
   return commentObj;
+}
+
+function makeDeleteButton(comment, commentElement) {
+  const button = document.createElement('button');
+  button.innerHTML = 'Delete';
+  button.addEventListener('click', () => {
+    deleteComment(comment);
+    commentElement.remove();
+  });
+
+  return button;
 }
 
 /**
@@ -191,4 +203,61 @@ function makeCommentAuthorElement(author) {
   commentAuthor.classList.add(COMMENT_AUTHOR);
 
   return commentAuthor;
+}
+
+/**
+ * Inserts new comment into the comment Display
+ */
+function updateComments() {
+  var commentText = getCommentText();
+  if (validComment(commentText)) {
+    const params = new URLSearchParams();
+    // params.append('id', );
+    params.append('comment-text', commentText);
+    fetch('new-comment', {method: 'POST', body: params}).then(refreshComments);
+  }
+}
+
+function refreshComments() {
+    clearComments();
+    getComments();
+}
+
+/**
+ * @return If the comment is not blank
+ */
+function validComment(comment) {
+  return !(comment.length === 0);
+}
+
+/**
+ * Gets and clears the comment-text input
+ */
+function getCommentText() {
+  const TEXT_INPUT = "inputComment";
+  const formInput = document.getElementById(TEXT_INPUT);
+  const text = formInput.value;
+  formInput.value = "";
+  return text;
+}
+
+/**
+ * Deletes all existing comment objects
+ */
+function clearComments() {
+  const commentDisplay = document.getElementById(COMMENTS_DISPLAY);
+  var child = commentDisplay.lastElementChild;
+  while (child) {
+    commentDisplay.removeChild(child);
+    child = commentDisplay.lastElementChild;
+  }
+}
+
+/**
+ * Deletes the given comment from the page and server
+ */
+function deleteComment (comment) {
+  const params = new URLSearchParams();
+  params.append('id', comment.id);
+  fetch('/delete-comment', {method: 'POST', body:params}).then(refreshComments);
 }

@@ -306,9 +306,9 @@
             <div id="commentsWrapper" title="Comments Tab" class="tabContent">
               <div id="commentsSection">
                 <h1>Share your thoughts!</h1>
-                <form id="commentForm" action="/data" method="POST">
-                  <input id="inputComment" type="text" name="comment-text" placeholder="Write a comment" required><br>
-                  <input id="submitBtn" type="submit" value="Submit"><br>
+                <form id="commentForm">
+                  <input id="inputComment" type="text" name="comment-text" placeholder="Leave a comment" required><br>
+                  <input id="submitBtn" type="button" value="Submit" onclick="updateComments()"><br>
                 </form>
               </div>
               <div id="commentsDisplay"></div>
