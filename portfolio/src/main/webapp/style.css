@@ -222,15 +222,18 @@ html, body {
 
 /* COMMENTS */
 
+#commentsWrapper {
+  margin: 5% 10% 5% 10%;
+}
+
 #commentsSection {
   font-size: 1.5em;
-  margin: 5% 10% 5% 10%;
   max-height: 90%;
 }
 
 #commentsSection h1 {
-  text-align: center;
   font-size: 3em;
+  text-align: center;
 }
 
 #commentForm {
@@ -248,5 +251,11 @@ html, body {
   border: 1px solid black;
   border-radius: 10px;
   box-shadow: 5px 5px 10px -2px;
-  margin: 20px;
+  margin-top: 20px;
+  padding-left: 5%;
+  width: 75%;
+}
+
+#commentsDisplay, #commentForm {
+  padding-left: 10%;
 }

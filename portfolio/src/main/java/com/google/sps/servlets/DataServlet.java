@@ -83,7 +83,6 @@ public class DataServlet extends HttpServlet {
     // retrieve text content of the comments
     for (Entity entity : results.asIterable()) {
       comments.add(entity.getProperty("text").toString());
-      if (comments.size() == 3) break;
     }
 
     // convert to json

@@ -123,24 +123,29 @@ function getComments() {
           });
 }
 
+/**The maximum number of comments that should be displayed */
+const MAX_COMMENTS = 3;
+
 /**
  * Handles the comments from the server by converting them to text and giving them to addNameToDom()
  */
 function handleGivenComments(comments) {
-  for (var comment of comments) {
-    addCommentToDom(comment);
+  for (var i = 0; i < Math.min(comments.length, MAX_COMMENTS); i++) {
+    addCommentToDom(comments[i]);
   }
 }
+
+const COMMENTS_DISPLAY = "commentsDisplay";
 
 /**
  * Adds the comment to the page
  */
 function addCommentToDom(comment) {
-  const commentSection = document.getElementById("commentsSection");
+  const commentDisplay = document.getElementById(COMMENTS_DISPLAY);
   const obj = makeCommentElement(comment, "Alice");
 
-  // add the new objects to the comment section
-  commentSection.appendChild(obj);
+  // add the new objects to the comment Display
+  commentDisplay.appendChild(obj);
 }
 
 /**
@@ -148,10 +153,14 @@ function addCommentToDom(comment) {
  */
 function makeCommentElement(text, author) {
   const commentObj = document.createElement("div");
-  commentObj.classList.add("comment")
+
+  /**Class name to style all comment blocks */
+  const COMMENT_CLASS = "comment";
+
+  commentObj.classList.add(COMMENT_CLASS);
   
-  commentObj.appendChild(makeCommentAuthorElement(author));
   commentObj.appendChild(makeCommentTextElement(text));
+  commentObj.appendChild(makeCommentAuthorElement(author));
 
   return commentObj;
 }
@@ -162,7 +171,10 @@ function makeCommentElement(text, author) {
 function makeCommentTextElement(text) {
   const commentText = document.createElement("p");
   commentText.innerText = text;
-  commentText.classList.add("commentText");
+
+  /**Class name to style the comment text blocks */
+  const COMMENT_TEXT = "commentText";
+  commentText.classList.add(COMMENT_TEXT);
 
   return commentText;
 }
@@ -172,8 +184,11 @@ function makeCommentTextElement(text) {
  */
 function makeCommentAuthorElement(author) {
   const commentAuthor = document.createElement("p");
-  commentAuthor.innerText = author;
-  commentAuthor.classList.add("commentAuthor");
+  commentAuthor.innerText = `- ${author}`;
+
+  /**Class name to style the comment author name */
+  const COMMENT_AUTHOR = "commentAuthor";
+  commentAuthor.classList.add(COMMENT_AUTHOR);
 
   return commentAuthor;
 }
