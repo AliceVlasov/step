@@ -3,6 +3,7 @@
   <head>
     <meta charset="UTF-8">
     <title>My Portfolio</title>
+    <script src="https://kit.fontawesome.com/f6989db744.js" crossorigin="anonymous"></script>
     <link rel="stylesheet" href="style.css">
     <script src="script.js"></script>
     <script> {
@@ -306,13 +307,21 @@
             <div id="commentsWrapper" title="Comments Tab" class="tabContent">
               <div id="commentsSection">
                 <h1>Share your thoughts!</h1>
-                <form id="commentForm">
-                  <input id="inputName" type="text" name="name" placeholder="Name" required><br>
-                  <input id="inputComment" type="text" name="comment-text" placeholder="Leave a comment" required><br>
-                  <input id="submitBtn" type="button" value="Submit" onclick="updateComments()"><br>
-                </form>
-              </div>
-              <div id="commentsDisplay"></div>
+                <div id="commentsBody">
+                  <form id="commentForm">
+                    <input id="inputName" type="text" name="name" placeholder="Name" required>
+                    <textarea id="inputComment" type="text" name="comment-text" placeholder="Leave a comment" required></textArea>
+                    <input id="submitBtn" type="button" value="Submit" onclick="updateComments()">
+                  </form>
+                  <div id="rightColumn">
+                    <form id="commentsVisible">
+                      <label for="number">Change the number of visible comments</label><br>
+                      <input type="number" id="number" min="1" max="20" value="10">
+                      <input type="button" id="enter" name="enter" value="Enter" onclick="refreshComments()">
+                    </form> 
+                    <div id="commentsDisplay"></div>
+                  </div>
+                </div>
             </div>
         </div>
     </div>

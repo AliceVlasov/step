@@ -117,7 +117,7 @@ const groupHeader = "groupHeader";
  * Fetches a message from the server and adds it to the DOM
  */
 function getComments() {
-  const comments = fetch("/list-comments");
+  const comments = fetch(`/list-comments?vis=${getVis()}`);
   comments.then(response => response.json()).then((comments) => { 
             handleGivenComments(comments)
           });
@@ -130,7 +130,7 @@ const MAX_COMMENTS = 3;
  * Handles the comments from the server by converting them to text and giving them to addNameToDom()
  */
 function handleGivenComments(comments) {
-  for (var i = 0; i < Math.min(comments.length, MAX_COMMENTS); i++) {
+  for (var i = 0; i < comments.length; i++) {
     addCommentToDom(comments[i]);
   }
 }
@@ -160,16 +160,17 @@ function makeCommentElement(comment, text, author) {
 
   commentObj.classList.add(COMMENT_CLASS);
   
-  commentObj.appendChild(makeCommentTextElement(text));
-  commentObj.appendChild(makeCommentAuthorElement(author));
   commentObj.appendChild(makeDeleteButton(comment, commentObj));
+  commentObj.appendChild(makeCommentAuthorElement(author));
+  commentObj.appendChild(makeCommentTextElement(text));
 
   return commentObj;
 }
 
 function makeDeleteButton(comment, commentElement) {
-  const button = document.createElement('button');
-  button.innerHTML = 'Delete';
+  const button = document.createElement('div');
+  button.innerHTML = '<i class="far fa-trash-alt"></i>';
+  button.classList.add("deleteButton");
   button.addEventListener('click', () => {
     deleteComment(comment);
     commentElement.remove();
@@ -183,7 +184,7 @@ function makeDeleteButton(comment, commentElement) {
  */
 function makeCommentTextElement(text) {
   const commentText = document.createElement("p");
-  commentText.innerText = text;
+  commentText.innerText = `"${text}"`;
 
   /**Class name to style the comment text blocks */
   const COMMENT_TEXT = "commentText";
@@ -197,7 +198,7 @@ function makeCommentTextElement(text) {
  */
 function makeCommentAuthorElement(author) {
   const commentAuthor = document.createElement("p");
-  commentAuthor.innerText = `- ${author}`;
+  commentAuthor.innerText = `@${author}`;
 
   /**Class name to style the comment author name */
   const COMMENT_AUTHOR = "commentAuthor";
@@ -236,10 +237,15 @@ function validComment(comment) {
  * Gets and clears the form input element
  */
 function getFormValue(id) {
-    const formInput = document.getElementById(id);
+   const formInput = document.getElementById(id);
    const val = formInput.value;
    formInput.value = "";
    return val;
+}
+
+function getVis() {
+  const visSelect = document.getElementById("number");
+  return visSelect.value;
 }
 
 /**

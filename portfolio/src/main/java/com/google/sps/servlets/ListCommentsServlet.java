@@ -38,13 +38,14 @@ public class ListCommentsServlet extends HttpServlet {
   @Override
   public void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
     response.setContentType("application/json;");
-    response.getWriter().println(getJson());
+    int maxComments = Integer.parseInt(request.getParameter("vis"));
+    response.getWriter().println(getJson(maxComments));
   }
 
   /**
    * @return the three most recent comments in json format
    */
-  public String getJson (){
+  public String getJson (int maxComments){
     List<Comment> comments = new ArrayList<>();
     DatastoreService datastore = DatastoreServiceFactory.getDatastoreService();
     
@@ -61,6 +62,7 @@ public class ListCommentsServlet extends HttpServlet {
 
       Comment comment = new Comment(id, commentText, commentAuthor, timestamp);
       comments.add(comment);
+      if (comments.size() == maxComments) break;
     }
 
     // convert to json
