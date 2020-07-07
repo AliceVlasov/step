@@ -339,3 +339,7 @@ html, body {
 #commentsVisible {
   margin: 10px 0 20px 0;
 }
+
+#enter {
+  display: inline-block;
+}
