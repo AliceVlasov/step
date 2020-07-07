@@ -30,10 +30,12 @@ public class NewCommentServlet extends HttpServlet {
   @Override
   public void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException {
     String commentText = request.getParameter("comment-text");
+    String commentAuthor = request.getParameter("comment-author");
     long timestamp = System.currentTimeMillis();
 
     Entity taskEntity = new Entity("Comment");
     taskEntity.setProperty("comment-text", commentText);
+    taskEntity.setProperty("comment-author", commentAuthor);
     taskEntity.setProperty("timestamp", timestamp);
 
     DatastoreService datastore = DatastoreServiceFactory.getDatastoreService();

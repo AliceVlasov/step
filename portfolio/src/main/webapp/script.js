@@ -142,7 +142,8 @@ const COMMENTS_DISPLAY = "commentsDisplay";
  */
 function addCommentToDom(comment) {
   const commentDisplay = document.getElementById(COMMENTS_DISPLAY);
-  const obj = makeCommentElement(comment, comment.commentText, "Alice");
+  const obj = makeCommentElement
+    (comment, comment.commentText, comment.commentAuthor);
 
   // add the new objects to the comment Display
   commentDisplay.appendChild(obj);
@@ -209,11 +210,12 @@ function makeCommentAuthorElement(author) {
  * Inserts new comment into the comment Display
  */
 function updateComments() {
-  var commentText = getCommentText();
+  var commentText = getFormValue("inputComment");
+  var commentAuthor = getFormValue("inputName");
   if (validComment(commentText)) {
     const params = new URLSearchParams();
-    // params.append('id', );
     params.append('comment-text', commentText);
+    params.append('comment-author', commentAuthor);
     fetch('new-comment', {method: 'POST', body: params}).then(refreshComments);
   }
 }
@@ -231,14 +233,13 @@ function validComment(comment) {
 }
 
 /**
- * Gets and clears the comment-text input
+ * Gets and clears the form input element
  */
-function getCommentText() {
-  const TEXT_INPUT = "inputComment";
-  const formInput = document.getElementById(TEXT_INPUT);
-  const text = formInput.value;
-  formInput.value = "";
-  return text;
+function getFormValue(id) {
+    const formInput = document.getElementById(id);
+   const val = formInput.value;
+   formInput.value = "";
+   return val;
 }
 
 /**
