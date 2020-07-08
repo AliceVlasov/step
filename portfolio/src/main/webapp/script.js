@@ -24,49 +24,40 @@ const TAB_SELECTED_CLASS = 'tabSelected';
 const TAB_CLASS = 'tab';
 
 function setUp() {
-  setTabEvents();
-  setInfoEvents();
+    setTabEvents();
+    setInfoEvents();
+    getComments();
 }
 
 /** Removes or adds a class from an object's class list as required
- * @param {Element} obj
+ * @param {Element} el
  * @param {String} className
- * @param {boolean} toAdd Determines whether to add or remove className from obj
+ * @param {boolean} toAdd Determines whether to add or remove className from el
  */
-function toggleClass(obj, className, toAdd) {
-  toAdd? obj.classList.add(className): obj.classList.remove(className);
+function toggleClass(el, className, toAdd) {
+  toAdd? el.classList.add(className): el.classList.remove(className);
 }
 
 // TAB FEATURES
 
 /** Adds click events with tab-switching feature to all tabs */
 function setTabEvents() {
-  let tabs = document.getElementsByClassName(TAB_CLASS);
-
-  for (const tab of tabs) {
-    tab.addEventListener('click', function() {
-      tabClickEvent(this);
-    });
-  }
-}
-
-/** Toggles visibility of tab content objects to simulate tab-switching
- * @param {Element} clickedTab Object that triggered a change in tabs
- */
-function tabClickEvent(clickedTab) {
-  /** Title of all objects related to the gallery tab */
-  const GALLERY_TAB_TITLE = 'Gallery Tab';
-  let currTab = prevSelectedTab(); // The tab that is currently visible
-
-  // The gallery tab has a different layout than the other tabs so it has extra steps to switch to and from it
-  if (currTab.getAttribute('title') === GALLERY_TAB_TITLE) {
-    toggleGallerySelection(/* revealGallery= */ false);
-  } else if (clickedTab.getAttribute('title') === GALLERY_TAB_TITLE) {
-    toggleGallerySelection(/* revealGallery= */ true);
-  }
-
-  switchTabSelection(currTab, clickedTab);
-}
+    /**Class name of all tabs that do not use the text or picture wrappers*/
+    const SPECIAL_TAB = "special";
+  
+    var tabs = document.getElementsByClassName(TAB_CLASS);
+    for (const tab of tabs) {
+        tab.addEventListener("click", function() {
+            if (prevSelectedTab().classList.contains(SPECIAL_TAB)) {
+                toggleSpecialTab(/**showSpecial=*/ false);
+            }
+            if (this.classList.contains(SPECIAL_TAB)) {
+                toggleSpecialTab(/**showSpecial=*/ true);
+            }
+            switchTabSelection(prevSelectedTab(), this);
+        });
+    }
+} // setTabEvents
 
 /**
  * @return {Element} Currently visible .tab object
@@ -75,11 +66,12 @@ function prevSelectedTab() {
   return document.getElementsByClassName(TAB_CLASS+' '+TAB_SELECTED_CLASS)[0];
 }
 
+// INFO FEATURES
 /**
- * Hides and reveals the wrappers for all tab content except for the gallery tab
+ * Hides and reveals the wrappers for all tab content except for the special tab
  * @param {boolean} showGallery Whether or not to hide the tab content wrappers
  */
-function toggleGallerySelection(showGallery) {
+function toggleSpecialTab(showSpecial) {
   /** Class name for hidden tab content wrappers */
   const HIDDEN_WRAPPER_CLASS = 'wrapperHidden';
 
@@ -91,7 +83,7 @@ function toggleGallerySelection(showGallery) {
   const TEXT_WRAPPER_ID = 'textWrapper';
   let textWrapper = document.getElementById(TEXT_WRAPPER_ID);
 
-  if (showGallery) {
+  if (showSpecial) {
     toggleClass(textWrapper, HIDDEN_WRAPPER_CLASS, /* addClass= */ true);
     toggleClass(pictureWrapper, HIDDEN_WRAPPER_CLASS, /* addClass= */ true);
   } else {
@@ -170,3 +162,164 @@ function getContent(header) {
   return header.nextElementSibling;
 }
 
+// Servlet functions
+
+/**
+ * Fetches a message from the server and adds it to the DOM
+ */
+function getComments() {
+  const comments = fetch(`/list-comments?vis=${getVis()}`);
+  comments.then(response => response.json()).then((comments) => { 
+            handleGivenComments(comments)
+          });
+}
+
+/**
+ * Handles the comments from the server by converting them to text and giving them to addNameToDom()
+ */
+function handleGivenComments(comments) {
+  for (var i = 0; i < comments.length; i++) {
+    addCommentToDom(comments[i]);
+  }
+}
+
+/** Id of the element that contains all the visible comments*/
+const COMMENTS_DISPLAY = "commentsDisplay";
+
+/**
+ * Adds the comment to the page
+ */
+function addCommentToDom(comment) {
+  const commentDisplay = document.getElementById(COMMENTS_DISPLAY);
+  const el = makeCommentElement
+    (comment, comment.commentText, comment.commentAuthor);
+
+  // add the new elements to the comment Display
+  commentDisplay.appendChild(el);
+}
+
+/**
+ * @return HTML div element containing the comment with relevant information and styling
+ */
+function makeCommentElement(comment, text, author) {
+  const commentElement = document.createElement("div");
+
+  /**Class name to style all comment blocks */
+  const COMMENT_CLASS = "comment";
+
+  commentElement.classList.add(COMMENT_CLASS);
+  
+  commentElement.appendChild(makeDeleteButton(comment, commentElement));
+  commentElement.appendChild(makeCommentAuthorElement(author));
+  commentElement.appendChild(makeCommentTextElement(text));
+
+  return commentElement;
+}
+
+/**
+ * @return delete button element
+ */
+function makeDeleteButton(comment, commentElement) {
+  const button = document.createElement('div');
+  button.innerHTML = '<i class="far fa-trash-alt"></i>';
+  button.classList.add("deleteButton");
+  button.addEventListener('click', () => {
+    deleteComment(comment);
+    commentElement.remove();
+  });
+
+  return button;
+}
+
+/**
+ * @return HTML paragraph containing the comment text
+ */
+function makeCommentTextElement(text) {
+  const commentText = document.createElement("p");
+  commentText.innerText = `"${text}"`;
+
+  /**Class name to style the comment text blocks */
+  const COMMENT_TEXT = "commentText";
+  commentText.classList.add(COMMENT_TEXT);
+
+  return commentText;
+}
+
+/**
+ * @return HTML paragraph containing the author's name
+ */
+function makeCommentAuthorElement(author) {
+  const commentAuthor = document.createElement("p");
+  commentAuthor.innerText = `@${author}`;
+
+  /**Class name to style the comment author name */
+  const COMMENT_AUTHOR = "commentAuthor";
+  commentAuthor.classList.add(COMMENT_AUTHOR);
+
+  return commentAuthor;
+}
+
+/**
+ * Inserts new comment into the comment Display
+ */
+function updateComments() {
+  var commentText = clearFormValue("inputComment");
+  var commentAuthor = clearFormValue("inputName");
+  if (validComment(commentText)) {
+    const params = new URLSearchParams();
+    params.append('comment-text', commentText);
+    params.append('comment-author', commentAuthor);
+    fetch('new-comment', {method: 'POST', body: params}).then(refreshComments);
+  }
+}
+
+function refreshComments() {
+    clearComments();
+    getComments();
+}
+
+/**
+ * @return If the comment is not blank
+ */
+function validComment(comment) {
+  return !!comment;
+}
+
+/**
+ * Clears and returns the form input element
+ */
+function clearFormValue(id) {
+   const formInput = document.getElementById(id);
+   const val = formInput.value;
+   formInput.value = "";
+   return val;
+}
+
+/**
+ * @return the requested number of visible comments by the client
+ */
+function getVis() {
+  const visSelect = document.getElementById("number");
+  return visSelect.value;
+}
+
+/**
+ * Deletes all existing commentelements
+ */
+function clearComments() {
+  const commentDisplay = document.getElementById(COMMENTS_DISPLAY);
+  var child = commentDisplay.lastElementChild;
+  while (child) {
+    commentDisplay.removeChild(child);
+    child = commentDisplay.lastElementChild;
+  }
+}
+
+/**
+ * Deletes the given comment from the page and server
+ */
+function deleteComment (comment) {
+  const params = new URLSearchParams();
+  params.append('id', comment.id);
+  fetch('/delete-comment', {method: 'POST', body:params}).then(refreshComments);
+}

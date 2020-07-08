@@ -2,6 +2,7 @@
 
 html, body {
   background-color: azure;
+  cursor: default;
   height: 100%;
   margin: 0;
   overflow: hidden;
@@ -47,16 +48,19 @@ html, body {
 }
 
 .tab {
+  align-items: center;
   background-color:rgb(242, 183, 125);
   border: 1px solid black;
   border-radius: 20% 20% 0 0;
   box-shadow: 8px 0px 10px -3px rgb(119, 101, 82);
-  height: 100%;
   cursor: pointer;
+  display: flex;
   float: left;
   font-size: 1.5em;
+  height: 100%;
+  justify-content: center;
   transition: background-color .2s;
-  width: calc(20% - 2px);
+  width: calc((100% / 6) - 2px);
 }
 
 .tab:hover {
@@ -147,9 +151,9 @@ html, body {
 
 #galleryWrapper {
   margin: 20px;
-  max-height: calc(100% - 80px);
-  overflow-y: auto;
   width: calc(100% - 40px);
+  overflow-y: auto;
+  max-height: calc(100% - 40px);
 }
 
 #galleryGrid {
@@ -194,11 +198,12 @@ html, body {
   transition: max-height .5s;
 }
 
-.groupHeader {
+.groupHeader { 
   background-color: #e68b1a;
   border-color: #e68b1a;
   border-radius: 20px;
   box-shadow: 5px 5px 10px -2px;
+  cursor: pointer;
   font-size: 1.2em;
   margin-left: 10px;
   margin-right: 20px;
@@ -218,4 +223,126 @@ html, body {
 
 #accordion {
   margin-bottom: 20px;
+}
+
+/* COMMENTS */
+
+#commentsWrapper {
+  margin: 2% 10% 5% 10%;
+}
+
+#commentsSection {
+  font-size: 1.5em;
+  max-height: 60vh;
+}
+
+#commentsDisplay {
+  padding: 0 0 30px 10px;
+  overflow: scroll;
+  height: 25vh;
+}
+
+#commentsSection h1 {
+  font-size: 3em;
+  text-align: center;
+}
+
+#commentForm {
+  margin-bottom: 20px;
+  height: 40vh;
+  overflow: hidden;
+  padding-left: 10%;
+  width: 40%;
+}
+
+#inputName {
+  display: block;
+  margin: 2%;
+  height: 2vh;
+  width: 50%;
+  border-radius: 10px;
+  padding: 20px;
+  border-color: lightgray;
+}
+
+#inputComment {
+  width: 80%;
+  border-radius: 20px;
+  height: 15vh;
+  margin: 2%;
+  overflow: scroll;
+  padding: 20px;
+}
+
+#inputComment:active {
+  outline: 0!important;
+}
+
+.comment {
+  background-color: rgb(255, 212, 171);
+  border: 1px solid transparent;
+  border-radius: 10px;
+  box-shadow: 5px 5px 10px -2px;
+  margin-top: 20px;
+  padding-left: 5%;
+  width: 75%;
+  font-size: 0.7em;
+  overflow-y: auto;
+}
+
+#commentsBody {
+  display: flex;
+}
+
+#submitBtn, #enter {
+  display: block;
+  background: white;
+  border-radius: 10px;
+  height: 4vh;
+  border-color: lightgray;
+  width: 10em;
+  margin: 2%;
+  cursor: pointer;
+}
+
+#number {
+  height: 2em;
+  width: 4em;
+  padding: 10px;
+  border-radius: 10px;
+  border-color: lightgray;
+}
+
+#rightColumn {
+  height: 40vh;
+  padding-left: 10%;
+  width: 60%;
+}
+
+.commentText {
+  max-width: 90%;
+  width: 90%;
+  margin-top: 0;
+  float: left;
+}
+
+.deleteButton {
+  width: 5%;
+  float: right;
+  margin: 2.5%;
+  text-align: center;
+  cursor: pointer;
+}
+
+.commentAuthor {
+  float: left;
+  width: 90%;
+}
+
+#commentsVisible {
+  margin: 10px 0 20px 0;
+}
+
+#enter {
+  display: inline-block;
 }
