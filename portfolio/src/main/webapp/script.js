@@ -207,8 +207,8 @@ function makeCommentAuthorElement(author) {
  * Inserts new comment into the comment Display
  */
 function updateComments() {
-  var commentText = getFormValue("inputComment");
-  var commentAuthor = getFormValue("inputName");
+  var commentText = clearFormValue("inputComment");
+  var commentAuthor = clearFormValue("inputName");
   if (validComment(commentText)) {
     const params = new URLSearchParams();
     params.append('comment-text', commentText);
@@ -230,9 +230,9 @@ function validComment(comment) {
 }
 
 /**
- * Gets and clears the form input element
+ * Clears and returns the form input element
  */
-function getFormValue(id) {
+function clearFormValue(id) {
    const formInput = document.getElementById(id);
    const val = formInput.value;
    formInput.value = "";
