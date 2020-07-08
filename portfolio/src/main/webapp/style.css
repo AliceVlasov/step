@@ -1,225 +1,228 @@
-/* GENERAL PROPERTIES */
+/* GENERAL */
 
 html, body {
-    height: 100%;
-    margin: 0;
-    background-color: azure;
-    cursor: default;
+  background-color: azure;
+  cursor: default;
+  height: 100%;
+  margin: 0;
+  overflow: hidden;
 }
 
 #content {
-    height: 100%;
+  height: 100%;
 }
 
-/* HEADER PROPERTIES */
+/* HEADER */
 
 #header {
-    height: 25%;
+  height: 25%;
 }
 
 #titleWrapper {
-    display: flex;
-    height: 75%;
-    align-items: center;
-    justify-content: center;
+  height: 75%;
 }
 
 #title {
-    font-size: 8em;
-    margin: 0;
+  font-size: 8em;
+  margin: 0;
 }
 
+/* TAB SELECTOR */
+
 #tabSelector {
-    height: 25%;
+  height: 25%;
 }
 
 #tabs {
-    float: right;
-    margin-right: 18px;
-    height: 100%;
-    width: 75%;
-}
-
-.tab {
-    background-color:rgb(242, 183, 125);
-    width: calc((100% / 6) - 2px);
-    height: 100%;
-    float: left;
-    border-radius: 20% 20% 0 0;
-    border: 1px solid black;
-    box-shadow: 8px 0px 10px -3px rgb(119, 101, 82);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 1.5em;
-    cursor: pointer;
-    transition: background-color 0.2s;
+  float: right;
+  height: 100%;
+  margin-right: 18px;
+  width: 75%;
 }
 
 .tabName {
-    text-align: center;
-    top: 50%;
-    bottom: 50%;
-    font-weight: 600;
+  bottom: 50%;
+  font-weight: 600;
+  text-align: center;
+  top: 50%;
+}
+
+.tab {
+  align-items: center;
+  background-color:rgb(242, 183, 125);
+  border: 1px solid black;
+  border-radius: 20% 20% 0 0;
+  box-shadow: 8px 0px 10px -3px rgb(119, 101, 82);
+  cursor: pointer;
+  display: flex;
+  float: left;
+  font-size: 1.5em;
+  height: 100%;
+  justify-content: center;
+  transition: background-color .2s;
+  width: calc((100% / 6) - 2px);
 }
 
 .tab:hover {
-    background-color:rgb(249, 200, 150);
-    display: flex;
-    align-items: center;
-    justify-content: center;
+  background-color:rgb(249, 200, 150);
 }
 
 .tab.tabSelected {
-    background-color: rgb(255, 212, 171);
-    border-bottom: 0;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    
+  background-color: rgb(255, 212, 171);
+  border-bottom: 0;
 }
 
-/* TAB PROPERTIES */
+/* NON-SPECIFIC TAB CONTENT */
+
+#titleWrapper, 
+.tab, 
+.tab:hover, 
+.tab.tabSelected, 
+.caption {
+  align-items: center;
+  display: flex;
+  justify-content: center;
+}
 
 #tabContent {
-    height: 72%;
-    width: calc(100% - 36px);
-    background-color: rgb(255, 212, 171);
-    border-radius: 10px 0px 10px 10px;
-    margin: 18px;
-    margin-top: 0;
-    overflow: hidden;
-    border: 1px solid black;
-    box-shadow: 8px -3px 10px -3px rgb(119, 101, 82);
+  background-color: rgb(255, 212, 171);
+  border: 1px solid black;
+  border-radius: 10px 0px 10px 10px;
+  box-shadow: 8px -3px 10px -3px rgb(119, 101, 82);
+  height: 72%;
+  margin: 18px;
+  margin-top: 0;
+  width: calc(100% - 36px);
 }
 
 #pictureWrapper {
-    display: flex;
-    justify-content: center;
-    float:left;
-    width: 40%;
-    height: 100%;
+  height: 100%;
+  width: 40%;
+  display: flex;
+  float: left;
+  justify-content: center;
 }
 
 #textWrapper {
-    display: flex;
-    float:left;
-    overflow-y: auto;
-    width: 60%;
-    height: 100%;
+  display: flex;
+  float: left;
+  height: 100%;
+  overflow-y: auto;
+  width: 60%;
+}
+
+.wrapperHidden {
+  display: none !important;
 }
 
 .tabContent {
-    display: none;
+  display: none;
 }
 
 .tabSelected {
-    display: block;
+  display: block;
 }
 
 .tabPicture {
-    height: 70%;
-    width: 70%;
-    background-size: cover;
-    background-position-y: center;
-    background-position-x: center;
-    align-self: center;
-    box-shadow: 10px 10px 10px -8px;
-    border-radius: 20px;
+  align-self: center;
+  background-position: center center;
+  background-size: cover;  
+  border-radius: 20px;
+  box-shadow: 10px 10px 10px -8px;
+  height: 70%;
+  width: 70%;
 }
 
 .tabText {
-    width: 100%;
-    margin: 15%;
-    max-height: 70%;
-    overflow-y: auto;
-    overflow-x: hidden;
-    font-size: 1.5em;
+  font-size: 1.5em;
+  margin: 15%;
+  max-height: 70%;  
+  overflow-y: auto;
+  overflow-x: hidden;
+  width: 100%;
 }
 
 .tabText h1 {
-    text-align: center;
-    margin-left: 10px;
+  margin-left: 10px;
+  text-align: center;
 }
 
-/* GALLERY PROPERTIES */
+/* GALLERY */
 
 #galleryWrapper {
-    margin: 20px;
-    width: calc(100% - 40px);
-    overflow-y: auto;
-    max-height: calc(100% - 40px);
+  margin: 20px;
+  width: calc(100% - 40px);
+  overflow-y: auto;
+  max-height: calc(100% - 40px);
 }
 
 #galleryGrid {
-    display: grid;
-    grid-template-columns: 33% 33% 33%;
+  display: grid;
+  grid-template-columns: 33% 33% 33%;
 }
 
 .gridItem {
-    height: 500px;
-    margin: 10px;
-    background-size: cover;
-    background-position-y: center;
-    box-shadow: 10px 10px 10px -8px;
-    border-radius: 20px;
-    display: flex;
-    align-items: flex-end;
+  align-items: flex-end;
+  background-position-y: center;
+  background-size: cover;
+  border-radius: 20px;
+  box-shadow: 10px 10px 10px -8px;
+  display: flex;
+  height: 500px;
+  margin: 10px;
 }
 
 .gridItem:hover .caption {
-    background-color: rgba(217, 218, 219, 0.8);
-    color: rgba(0, 0, 0, 1);
+  background-color: rgba(217, 218, 219, .8);
+  color: rgba(0, 0, 0, 1);
 }
 
 .caption {
-    width: 100%;
-    height: 20%;
-    border-radius: 0 0 20px 20px;
-    text-align: center;
-    font-size: 20px;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    transition: background-color 0.5s, color 0.5s;
-    background-color: rgba(217, 218, 219, 0);
-    color: rgba(0, 0, 0, 0);
+  background-color: rgba(217, 218, 219, 0);
+  border-radius: 0 0 20px 20px;
+  color: rgba(0, 0, 0, 0);
+  font-size: 20px;
+  height: 20%;
+  text-align: center;
+  transition: background-color .5s, color .5s;
+  width: 100%;
 }
 
 /* TAB CONTENT */
 
 .groupContent {
-    max-height: 0;
-    padding-left: 20px;
-    padding-right: 40px;
-    overflow: hidden;
-    transition: max-height 0.5s;
+  max-height: 0;
+  overflow: hidden;
+  padding-left: 20px;
+  padding-right: 40px;
+  transition: max-height .5s;
 }
 
-.groupHeader {
-    margin-right: 20px;
-    padding-left: 10px;
-    background-color: #e68b1a;
-    border-color: #e68b1a;
-    box-shadow: 5px 5px 10px -2px;
-    border-radius: 20px;
-    transition: background-color 0.5s, border-color 0.5s;
-    width: 95%;
-    margin-left: 10px;
-    font-size: 1.2em;
-    min-height: 3.5em;
-    outline: 0;
-    cursor: pointer;
+.groupHeader { 
+  background-color: #e68b1a;
+  border-color: #e68b1a;
+  border-radius: 20px;
+  box-shadow: 5px 5px 10px -2px;
+  cursor: pointer;
+  font-size: 1.2em;
+  margin-left: 10px;
+  margin-right: 20px;
+  min-height: 3.5em;
+  outline: 0;
+  padding-left: 10px;
+  transition: background-color .5s, border-color .5s;
+  width: 95%;
 }
 
-.groupHeader:hover, .active{
-    background-color: #f3ad56;
-    border-color: #f3ad56;
-    outline: 0;
+.groupHeader:hover, 
+.active {
+  background-color: #f3ad56;
+  border-color: #f3ad56;
+  outline: 0;
 }
 
 #accordion {
-    margin-bottom: 20px;
+  margin-bottom: 20px;
 }
 
 /* COMMENTS */

@@ -1,99 +1,27 @@
 // Copyright 2019 Google LLC
 //
-// Licensed under the Apache License, Version 2.0 (the "License");
+// Licensed under the Apache License, Version 2.0 (the 'License');
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
 //
-//     https://www.apache.org/licenses/LICENSE-2.0
+//   https://www.apache.org/licenses/LICENSE-2.0
 //
 // Unless required by applicable law or agreed to in writing, software
-// distributed under the License is distributed on an "AS IS" BASIS,
+// distributed under the License is distributed on an 'AS IS' BASIS,
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-// TAB FEATURES
+// Only begin setting event listeners once all the HTML is loaded
+document.addEventListener('DOMContentLoaded', function() {
+    setUp();
+  }, false);
 
-function toggleClass(el, className, toAdd) {
-    toAdd? el.classList.add(className): el.classList.remove(className);
-}
+/** Class name for visible .tab and .tabContent objects*/
+const TAB_SELECTED_CLASS = 'tabSelected';
 
-function switchTabSelection(tabRemove, tabAdd) {
-    if (tabRemove === tabAdd) {
-        return;
-    }
-
-    contentRemove = document.querySelectorAll("[title="+"\""+tabRemove.getAttribute("title")+"\""+"]");
-    contentAdd = document.querySelectorAll("[title="+"\""+tabAdd.getAttribute("title")+"\""+"]");
-    
-    contentAdd.forEach(function(el) {
-        toggleClass(el, tabSelectedClass, true);
-    });
-    contentRemove.forEach(function(el) {
-        toggleClass(el, tabSelectedClass, false);
-    });
-}
-
-function prevSelectedTab() {
-    return document.getElementsByClassName(tabClass+" "+tabSelectedClass)[0];
-}
-
-function toggleSpecialTab(showGallery) {
-    var textWrapper = document.getElementById("textWrapper");
-    var pictureWrapper = document.getElementById("pictureWrapper");
-    if (showGallery) {
-        textWrapper.style.display = "none";
-        pictureWrapper.style.display = "none";
-    }
-    else {
-        textWrapper.style.display = "flex";
-        pictureWrapper.style.display = "flex";    
-    }
-}
-
-function setTabEvents() {
-    var tabs = document.getElementsByClassName(tabClass);
-    var tab;
-    for (var i = 0; i < tabs.length; i++) {
-        tab = tabs[i];
-        tab.addEventListener("click", function() {
-            if (prevSelectedTab().classList.contains(SPECIAL_TAB)) {
-                toggleSpecialTab(false);
-            }
-            if (this.classList.contains(SPECIAL_TAB)) {
-                toggleSpecialTab(true);
-            }
-            switchTabSelection(prevSelectedTab(), this);
-        });
-    }
-} // setTabEvents
-
-// INFO FEATURES
-
-function getContent(header) {
-    return header.nextElementSibling;
-}
-
-function toggleGroupContent(header) {
-    var content = getContent(header);
-    
-    header.classList.toggle("active");
-    if (content.style.maxHeight) {
-        content.style.maxHeight = null;
-    } else {
-        content.style.maxHeight = content.scrollHeight + "px";
-    }
-}
-
-function setInfoEvents() {
-    var infoHeaders = document.getElementsByClassName(groupHeader);
-    for (var i = 0; i < infoHeaders.length; i++) {
-        infoHeaders[i].addEventListener("click", function() {
-            toggleGroupContent(this);
-        });
-    }
-
-}
+/** Class name for .tab objects */
+const TAB_CLASS = 'tab';
 
 function setUp() {
     setTabEvents();
@@ -101,11 +29,138 @@ function setUp() {
     getComments();
 }
 
-const tabSelectedClass = "tabSelected";
-const tabClass = "tab";
-const tabContentClass = "tabContent";
-const SPECIAL_TAB = "special";
-const groupHeader = "groupHeader";
+/** Removes or adds a class from an object's class list as required
+ * @param {Element} el
+ * @param {String} className
+ * @param {boolean} toAdd Determines whether to add or remove className from el
+ */
+function toggleClass(el, className, toAdd) {
+  toAdd? el.classList.add(className): el.classList.remove(className);
+}
+
+// TAB FEATURES
+
+/** Adds click events with tab-switching feature to all tabs */
+function setTabEvents() {
+    /**Class name of all tabs that do not use the text or picture wrappers*/
+    const SPECIAL_TAB = "special";
+  
+    var tabs = document.getElementsByClassName(TAB_CLASS);
+    for (const tab of tabs) {
+        tab.addEventListener("click", function() {
+            if (prevSelectedTab().classList.contains(SPECIAL_TAB)) {
+                toggleSpecialTab(/**showSpecial=*/ false);
+            }
+            if (this.classList.contains(SPECIAL_TAB)) {
+                toggleSpecialTab(/**showSpecial=*/ true);
+            }
+            switchTabSelection(prevSelectedTab(), this);
+        });
+    }
+} // setTabEvents
+
+/**
+ * @return {Element} Currently visible .tab object
+ */
+function prevSelectedTab() {
+  return document.getElementsByClassName(TAB_CLASS+' '+TAB_SELECTED_CLASS)[0];
+}
+
+// INFO FEATURES
+/**
+ * Hides and reveals the wrappers for all tab content except for the special tab
+ * @param {boolean} showGallery Whether or not to hide the tab content wrappers
+ */
+function toggleSpecialTab(showSpecial) {
+  /** Class name for hidden tab content wrappers */
+  const HIDDEN_WRAPPER_CLASS = 'wrapperHidden';
+
+  /** ID of the container for all tab pictures except for the gallery tab */
+  const PICTURE_WRAPPER_ID = 'pictureWrapper';
+  let pictureWrapper = document.getElementById(PICTURE_WRAPPER_ID);
+
+  /** ID of the container for all tab text except for the gallery tab */
+  const TEXT_WRAPPER_ID = 'textWrapper';
+  let textWrapper = document.getElementById(TEXT_WRAPPER_ID);
+
+  if (showSpecial) {
+    toggleClass(textWrapper, HIDDEN_WRAPPER_CLASS, /* addClass= */ true);
+    toggleClass(pictureWrapper, HIDDEN_WRAPPER_CLASS, /* addClass= */ true);
+  } else {
+    toggleClass(textWrapper, HIDDEN_WRAPPER_CLASS, /* addClass= */ false);
+    toggleClass(pictureWrapper, HIDDEN_WRAPPER_CLASS, /* addClass= */ false);
+  }
+}
+
+/**
+ * Hide current tab and its content and show the clicked tab and its content
+ */
+function switchTabSelection(tabToHide, tabToShow) {
+  if (tabToHide === tabToShow) return;
+
+  toggleTabContent(tabToHide, /* toShow= */ false);
+  toggleTabContent(tabToShow, /* toShow= */ true);
+}
+
+/**
+ * Removes or adds the tabSelected class from a tab and its content
+ * @param {Element} tab
+ * @param {boolean} toShow Whether or not the objects need to be revealed
+ */
+function toggleTabContent(tab, toShow) {
+  let tabContent = getElementsByTitle(tab.getAttribute('title'));
+  
+  for (const elem of tabContent) {
+    toggleClass(elem, TAB_SELECTED_CLASS, /* addClass= */ toShow);
+  }
+}
+
+/**
+ * @param {String} title Value of the title attribute being looked for
+ * @return {[Element]} All elements with the given title
+ */
+function getElementsByTitle(title) {
+  return document.querySelectorAll(`[title='${title}']`);
+}
+
+// INFO EVENTS
+
+/** Sets animations when headers in each tab are clicked */
+function setInfoEvents() {
+  /** Class name for all objects with content that collapses */
+  const GROUP_HEADER_CLASS = 'groupHeader';
+
+  let infoHeaders = document.getElementsByClassName(GROUP_HEADER_CLASS);
+
+  for (const header of infoHeaders) {
+    header.addEventListener('click', function() {
+      toggleGroupContent(this);
+    });
+  }
+}
+
+/** 
+ * Changes the height of the content associated with the header to 0 or the 
+ * height necessary to make all the text visible
+ * @param {Element} header The object that was clicked
+ */
+function toggleGroupContent(header) {
+  // The animation is triggered for elements with the 'active' attribute toggled
+  header.classList.toggle('active');
+  
+  let content = getContent(header);
+  
+  if (content.style.maxHeight) {
+    content.style.maxHeight = null;
+  } else {
+    content.style.maxHeight = `${content.scrollHeight}px`;
+  }
+}
+
+/**@return {Element} The content associated with the header */
+function getContent(header) {
+  return header.nextElementSibling;
+}
 
 // Servlet functions
 
@@ -119,9 +174,6 @@ function getComments() {
           });
 }
 
-/**The maximum number of comments that should be displayed */
-const MAX_COMMENTS = 3;
-
 /**
  * Handles the comments from the server by converting them to text and giving them to addNameToDom()
  */
@@ -131,6 +183,7 @@ function handleGivenComments(comments) {
   }
 }
 
+/** Id of the element that contains all the visible comments*/
 const COMMENTS_DISPLAY = "commentsDisplay";
 
 /**
@@ -163,6 +216,9 @@ function makeCommentElement(comment, text, author) {
   return commentElement;
 }
 
+/**
+ * @return delete button element
+ */
 function makeDeleteButton(comment, commentElement) {
   const button = document.createElement('div');
   button.innerHTML = '<i class="far fa-trash-alt"></i>';
@@ -239,6 +295,9 @@ function clearFormValue(id) {
    return val;
 }
 
+/**
+ * @return the requested number of visible comments by the client
+ */
 function getVis() {
   const visSelect = document.getElementById("number");
   return visSelect.value;
