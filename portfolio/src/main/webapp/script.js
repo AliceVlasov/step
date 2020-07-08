@@ -226,7 +226,7 @@ function refreshComments() {
  * @return If the comment is not blank
  */
 function validComment(comment) {
-  return !(comment.length === 0);
+  return !!comment;
 }
 
 /**
