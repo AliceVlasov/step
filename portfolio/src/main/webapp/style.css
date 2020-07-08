@@ -225,50 +225,54 @@ html, body {
   margin-bottom: 20px;
 }
 
+
+
 /* COMMENTS */
 
 #commentsWrapper {
-  margin: 2% 10% 5% 10%;
+  height: 93%;
+  margin: 2% 6% 5% 6%;
 }
 
 #commentsSection {
   font-size: 1.5em;
-  max-height: 60vh;
+  height: 100%;
 }
 
 #commentsDisplay {
   padding: 0 0 30px 10px;
   overflow: scroll;
-  height: 25vh;
+  height: 50%;
 }
 
 #commentsSection h1 {
   font-size: 3em;
   text-align: center;
+  margin: 30px 0;
 }
 
 #commentForm {
   margin-bottom: 20px;
-  height: 40vh;
+  height: 100%;
   overflow: hidden;
-  padding-left: 10%;
-  width: 40%;
+  padding-left: 20px;
+  width: 25%;
 }
 
 #inputName {
   display: block;
-  margin: 2%;
-  height: 2vh;
+  margin: 0 auto 2% 2%;
+  height: 20px;
   width: 50%;
   border-radius: 10px;
-  padding: 20px;
+  padding: 10px;
   border-color: lightgray;
 }
 
 #inputComment {
-  width: 80%;
+  width: calc(96% - 40px);
   border-radius: 20px;
-  height: 15vh;
+  height: calc(94% - 140px);
   margin: 2%;
   overflow: scroll;
   padding: 20px;
@@ -292,15 +296,16 @@ html, body {
 
 #commentsBody {
   display: flex;
+  height: calc(100% - 60px - 3em);
 }
 
 #submitBtn, #enter {
   display: block;
   background: white;
   border-radius: 10px;
-  height: 4vh;
+  height: 40px;
   border-color: lightgray;
-  width: 10em;
+  width: 50%;
   margin: 2%;
   cursor: pointer;
 }
@@ -314,9 +319,9 @@ html, body {
 }
 
 #rightColumn {
-  height: 40vh;
-  padding-left: 10%;
-  width: 60%;
+  height: 100%;
+  padding-left: 20px;
+  width: 30%;
 }
 
 .commentText {
@@ -340,9 +345,14 @@ html, body {
 }
 
 #commentsVisible {
-  margin: 10px 0 20px 0;
+  margin-bottom: 20px;
+  overflow: auto;
 }
 
 #enter {
   display: inline-block;
+}
+
+#map {
+  width: 45%;
 }

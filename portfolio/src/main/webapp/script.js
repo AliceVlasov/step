@@ -27,6 +27,7 @@ function setUp() {
     setTabEvents();
     setInfoEvents();
     getComments();
+    createMap();
 }
 
 /** Removes or adds a class from an object's class list as required
@@ -322,4 +323,12 @@ function deleteComment (comment) {
   const params = new URLSearchParams();
   params.append('id', comment.id);
   fetch('/delete-comment', {method: 'POST', body:params}).then(refreshComments);
+}
+
+// MAP FUNCTIONS
+
+function createMap() {
+  const map = new google.maps.Map(
+    document.getElementById('map'), 
+      {center: {lat: 37.422, lng: -122.084}, zoom: 16});
 }
