@@ -14,8 +14,8 @@
 
 // TAB FEATURES
 
-function toggleClass(obj, className, toAdd) {
-    toAdd? obj.classList.add(className): obj.classList.remove(className);
+function toggleClass(el, className, toAdd) {
+    toAdd? el.classList.add(className): el.classList.remove(className);
 }
 
 function switchTabSelection(tabRemove, tabAdd) {
@@ -26,11 +26,11 @@ function switchTabSelection(tabRemove, tabAdd) {
     contentRemove = document.querySelectorAll("[title="+"\""+tabRemove.getAttribute("title")+"\""+"]");
     contentAdd = document.querySelectorAll("[title="+"\""+tabAdd.getAttribute("title")+"\""+"]");
     
-    contentAdd.forEach(function(obj) {
-        toggleClass(obj, tabSelectedClass, true);
+    contentAdd.forEach(function(el) {
+        toggleClass(el, tabSelectedClass, true);
     });
-    contentRemove.forEach(function(obj) {
-        toggleClass(obj, tabSelectedClass, false);
+    contentRemove.forEach(function(el) {
+        toggleClass(el, tabSelectedClass, false);
     });
 }
 
@@ -99,10 +99,6 @@ function setUp() {
     setTabEvents();
     setInfoEvents();
     getComments();
-    // setFormSubmit();
-
-    // var postTarget = document.getElementById("submitTarget");
-    // postTarget.onload = onLoadPost;
 }
 
 const tabSelectedClass = "tabSelected";
@@ -142,29 +138,29 @@ const COMMENTS_DISPLAY = "commentsDisplay";
  */
 function addCommentToDom(comment) {
   const commentDisplay = document.getElementById(COMMENTS_DISPLAY);
-  const obj = makeCommentElement
+  const el = makeCommentElement
     (comment, comment.commentText, comment.commentAuthor);
 
-  // add the new objects to the comment Display
-  commentDisplay.appendChild(obj);
+  // add the new elements to the comment Display
+  commentDisplay.appendChild(el);
 }
 
 /**
- * @return HTML div object containing the comment with relevant information and styling
+ * @return HTML div element containing the comment with relevant information and styling
  */
 function makeCommentElement(comment, text, author) {
-  const commentObj = document.createElement("div");
+  const commentElement = document.createElement("div");
 
   /**Class name to style all comment blocks */
   const COMMENT_CLASS = "comment";
 
-  commentObj.classList.add(COMMENT_CLASS);
+  commentElement.classList.add(COMMENT_CLASS);
   
-  commentObj.appendChild(makeDeleteButton(comment, commentObj));
-  commentObj.appendChild(makeCommentAuthorElement(author));
-  commentObj.appendChild(makeCommentTextElement(text));
+  commentElement.appendChild(makeDeleteButton(comment, commentElement));
+  commentElement.appendChild(makeCommentAuthorElement(author));
+  commentElement.appendChild(makeCommentTextElement(text));
 
-  return commentObj;
+  return commentElement;
 }
 
 function makeDeleteButton(comment, commentElement) {
@@ -249,7 +245,7 @@ function getVis() {
 }
 
 /**
- * Deletes all existing comment objects
+ * Deletes all existing commentelements
  */
 function clearComments() {
   const commentDisplay = document.getElementById(COMMENTS_DISPLAY);
