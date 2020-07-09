@@ -330,5 +330,25 @@ function deleteComment (comment) {
 function createMap() {
   const map = new google.maps.Map(
     document.getElementById('map'), 
-      {center: {lat: 37.422, lng: -122.084}, zoom: 16});
+      {center: {lat: 43.65, lng: -79.38}, zoom: 8});   
+  loadMarkers(map); 
+  setClickEvents(map);
+}
+
+function loadMarkers() {
+  const toronto = {lat: 43.65, lng: -79.38};
+  addMarker(toronto, map); 
+  //TODO: load markers from a servlet    
+}
+
+function addMarker(latLng, map) {
+  var marker = new google.maps.Marker({position: latLng, map: map});
+}
+
+function setClickEvents(map) {
+  map.addListener('click', function(mouse) {
+    const latLng = mouse.latLng;
+    addMarker(latLng, map);
+    map.panTo(latLng);
+  });
 }
