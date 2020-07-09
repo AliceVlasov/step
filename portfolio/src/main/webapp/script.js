@@ -278,6 +278,7 @@ function makeCommentAuthorElement(author) {
 function updateComments() {
   var commentText = clearFormValue("inputComment");
   var commentAuthor = clearFormValue("inputName");
+  newMarker = null;
   if (validComment(commentText)) {
     const params = new URLSearchParams();
     params.append('comment-text', commentText);
@@ -349,18 +350,41 @@ function createMap() {
 
 function loadMarkers() {
   const toronto = {lat: 43.65, lng: -79.38};
-  addMarker(toronto, map); 
+  const marker = makeMarker(toronto, map); 
   //TODO: load markers from a servlet    
 }
 
-function addMarker(latLng, map) {
+/**
+ * @return the Marker object added to the map
+ */
+function makeMarker(latLng, map) {
   var marker = new google.maps.Marker({position: latLng, map: map});
+  return marker;
 }
+
+
 
 function setClickEvents(map) {
   map.addListener('click', function(mouse) {
     const latLng = mouse.latLng;
-    addMarker(latLng, map);
+    setCommentMarker(latLng, map);
     map.panTo(latLng);
   });
+}
+
+/**
+ *Stores the most recently added marker to the map which has not
+ *been uploaded to the server yet.
+ */
+var newMarker = null;
+
+/**
+ * Adds a marker to the map where clicked and removes the previous newMarker
+ * when applicable
+ */
+function setCommentMarker(latLng, map) {
+  if (newMarker) {
+    newMarker.setMap(null);
+  }
+  newMarker = makeMarker(latLng, map)
 }
