@@ -331,10 +331,10 @@ html, body {
   float: left;
 }
 
-.deleteButton {
-  width: 5%;
+.deleteButton, .locationTag {
+  width: 2.5%;
   float: right;
-  margin: 2.5%;
+  margin: 2.5% 2.5% 2.5% 0;
   text-align: center;
   cursor: pointer;
 }

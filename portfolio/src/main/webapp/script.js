@@ -209,13 +209,25 @@ function makeCommentElement(comment, text, author) {
   const COMMENT_CLASS = "comment";
 
   commentElement.classList.add(COMMENT_CLASS);
-  
+
   commentElement.appendChild(makeDeleteButton(comment, commentElement));
+  commentElement.appendChild(makeLocationButton(comment, commentElement));
   commentElement.appendChild(makeCommentAuthorElement(author));
   commentElement.appendChild(makeCommentTextElement(text));
 
   return commentElement;
 }
+
+/**
+ * @return location button element
+ */
+ function makeLocationButton(comment, commentElement) {
+   const button = document.createElement('div');
+   button.innerHTML = '<i class="fas fa-map-marker-alt"></i>';
+   button.classList.add("locationTag");
+   //TODO: add click event
+   return button;
+ }
 
 /**
  * @return delete button element
