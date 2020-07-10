@@ -26,8 +26,8 @@ const TAB_CLASS = 'tab';
 function setUp() {
     setTabEvents();
     setInfoEvents();
-    getComments();
     createMap();
+    getComments();
 }
 
 /** Removes or adds a class from an object's class list as required
@@ -163,6 +163,7 @@ function getContent(header) {
   return header.nextElementSibling;
 }
 
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 // Servlet functions
 
 /**
@@ -180,7 +181,8 @@ function getComments() {
  */
 function handleGivenComments(comments) {
   for (var i = 0; i < comments.length; i++) {
-    addCommentToDom(comments[i]);
+    const commentElement = addCommentToDom(comments[i]);
+    loadMarker(comments[i], commentElement);
   }
 }
 
@@ -193,16 +195,17 @@ const COMMENTS_DISPLAY = "commentsDisplay";
 function addCommentToDom(comment) {
   const commentDisplay = document.getElementById(COMMENTS_DISPLAY);
   const el = makeCommentElement
-    (comment, comment.commentText, comment.commentAuthor);
+    (comment);
 
   // add the new elements to the comment Display
   commentDisplay.appendChild(el);
+  return el;
 }
 
 /**
  * @return HTML div element containing the comment with relevant information and styling
  */
-function makeCommentElement(comment, text, author) {
+function makeCommentElement(comment) {
   const commentElement = document.createElement("div");
 
   /**Class name to style all comment blocks */
@@ -212,8 +215,8 @@ function makeCommentElement(comment, text, author) {
 
   commentElement.appendChild(makeDeleteButton(comment, commentElement));
   commentElement.appendChild(makeLocationButton(comment, commentElement));
-  commentElement.appendChild(makeCommentAuthorElement(author));
-  commentElement.appendChild(makeCommentTextElement(text));
+  commentElement.appendChild(makeCommentAuthorElement(comment.commentAuthor));
+  commentElement.appendChild(makeCommentTextElement(comment.commentText));
 
   return commentElement;
 }
@@ -225,9 +228,30 @@ function makeCommentElement(comment, text, author) {
    const button = document.createElement('div');
    button.innerHTML = '<i class="fas fa-map-marker-alt"></i>';
    button.classList.add("locationTag");
-   //TODO: add click event
+   button.addEventListener('click', () => {
+     selectCommentMarkerPair(comment.markerId, commentElement);
+   });
    return button;
  }
+
+  /**
+   * Pans the map to this marker and highlights the comment Element
+   */
+ function selectCommentMarkerPair(markerId, commentElement) {
+  const SELECTED_COMMENT = "selectedComment"
+  //center this marker on the map
+  const marker = permMarkers[`${markerId}`];
+  MAP.panTo(marker.getPosition());
+
+  const prevSelectedComment = 
+    document.getElementsByClassName(SELECTED_COMMENT)[0];
+    if (prevSelectedComment) {
+      prevSelectedComment.classList.remove(SELECTED_COMMENT);
+    }   
+  commentElement.classList.add(SELECTED_COMMENT); 
+  //TODO: make comments section scroll to this comment object;
+ }
+
 
 /**
  * @return delete button element
@@ -237,6 +261,7 @@ function makeDeleteButton(comment, commentElement) {
   button.innerHTML = '<i class="far fa-trash-alt"></i>';
   button.classList.add("deleteButton");
   button.addEventListener('click', () => {
+    deleteMarker(comment.markerId);
     deleteComment(comment);
     commentElement.remove();
   });
@@ -273,22 +298,55 @@ function makeCommentAuthorElement(author) {
 }
 
 /**
- * Inserts new comment into the comment Display
+ * Gets form input and uploads it to the servers
  */
-function updateComments() {
+function updateComments() { 
+  //retrieve form values
   var commentText = clearFormValue("inputComment");
   var commentAuthor = clearFormValue("inputName");
-  newMarker = null;
-  if (validComment(commentText)) {
-    const params = new URLSearchParams();
-    params.append('comment-text', commentText);
-    params.append('comment-author', commentAuthor);
-    fetch('new-comment', {method: 'POST', body: params}).then(refreshComments);
+
+  //TODO: replace loading map and comments with "loading..."
+  if (!validComment(commentText)) {
+    alert("invalid comment");
+    return;
   }
+
+  const latLng = tempMarker? tempMarker.getPosition(): DEFAULT_COORDS;
+  console.log(latLng.toString());
+
+  const params = new URLSearchParams();
+  params.append('lat', latLng.lat());
+  params.append('lng', latLng.lng());
+  params.append('visible', true);
+  console.log(params);
+  tempMarker.setMap(null);
+
+  fetch('/markers', {method:'POST', body: params})
+    .then(response => response.text()).then((idText) => {
+      const markerId = parseInt(idText);
+      uploadComment(markerId, commentText, commentAuthor);
+    });
 }
 
+/**
+ * uploads the values to the new-comment server
+ */
+function uploadComment(markerId, commentText, commentAuthor) {
+  const params = new URLSearchParams();
+  params.append('comment-text', commentText);
+  params.append('comment-author', commentAuthor);
+  params.append('marker-id', markerId);
+
+  fetch('new-comment', {method: 'POST', body: params})
+    .then(refreshComments);
+}
+
+/**
+ * clears all displayed comments and adds back an updated list of comments
+ */
 function refreshComments() {
     clearComments();
+    clearMarkers();
     getComments();
 }
 
@@ -328,6 +386,16 @@ function clearComments() {
     child = commentDisplay.lastElementChild;
   }
 }
+/**
+ * Removes all visible markers from the map and clears the permMarkers object
+ */
+function clearMarkers() {
+  if (tempMarker) tempMarker.setMap(null);
+  for (const id in permMarkers) {
+    permMarkers[id].setMap(null);
+    delete permMarkers[id];
+  }
+}
 
 /**
  * Deletes the given comment from the page and server
@@ -335,40 +403,99 @@ function clearComments() {
 function deleteComment (comment) {
   const params = new URLSearchParams();
   params.append('id', comment.id);
-  fetch('/delete-comment', {method: 'POST', body:params}).then(refreshComments);
-}
-
-// MAP FUNCTIONS
-
-function createMap() {
-  const map = new google.maps.Map(
-    document.getElementById('map'), 
-      {center: {lat: 43.65, lng: -79.38}, zoom: 8});   
-  loadMarkers(map); 
-  setClickEvents(map);
-}
-
-function loadMarkers() {
-  const toronto = {lat: 43.65, lng: -79.38};
-  const marker = makeMarker(toronto, map); 
-  //TODO: load markers from a servlet    
+  fetch('/delete-comment', {method: 'POST', body:params})
+    .then(refreshComments);
 }
 
 /**
+ * Deletes the given comment from the page and server
+ */
+function deleteMarker (markerId) {
+  const marker = permMarkers[`${markerId}`];
+  marker.setMap(null);
+
+  const params = new URLSearchParams();
+  params.append('id', markerId);
+  fetch('/delete-marker', {method: 'POST', body:params});
+}
+
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+// MAP FUNCTIONS
+
+/** The map object on the comments page*/
+var MAP = null;
+
+/**
+ * Default coordinates to center the map and for comments with no
+ * location tag 
+ */
+const DEFAULT_COORDS = {lat: 43.65, lng: -79.38};
+
+/**
+ * Makes an instance of a Map and sets map-related events
+ */
+function createMap() {
+  MAP = new google.maps.Map(
+    document.getElementById('map'), 
+      {center: DEFAULT_COORDS, zoom: 8});     
+  setMapClickEvents();
+}
+
+/**
+ * Fetches the marker for this comment and adds it to the map
+ */
+function loadMarker(comment, commentElement) {
+  const markerId = comment.markerId;
+  console.log(markerId);
+  const marker = fetch(`/markers?id=${markerId}`);
+  marker.then(response => response.json()).then((marker) => { 
+      makeMarker ({lat: marker.lat, lng: marker.lng}, 
+        marker.visible, commentElement, markerId);
+    });     
+}
+
+/**array to hold all the visible markers, their ids and Marker objects */
+const permMarkers = {};
+
+/**
+ * @param {latLng} latLng coordinates of the marker
+ * @param {boolean} visible whether or not the client should be able to interact with this marker
+ * @param {HTML element} commentElement optional parameter indicating connected comment object
+ * @param {long} id optional parameter to set marker id
  * @return the Marker object added to the map
  */
-function makeMarker(latLng, map) {
-  var marker = new google.maps.Marker({position: latLng, map: map});
+function makeMarker(latLng, visible, commentElement, markerId) {
+  var marker = new google.maps.Marker({position: latLng, map: MAP});
+  if (!visible) {
+    marker.setOptions(new MarkerOptions().visible(false));
+    marker.setClickable(false);
+  }
+  if (markerId) {
+    permMarkers[`${markerId}`] = marker;
+    marker.addListener("click", function() {
+      selectCommentMarkerPair(markerId, commentElement);
+    });
+  }
   return marker;
 }
 
+/**
+ * Allows client to click on the map repeatedly to choose on location
+ * to tag to their comment
+ */
+function placeMarkerAndPanTo(latLng, map) {
+  var marker = new google.maps.Marker({
+    position: latLng,
+    map: map
+  });
+  map.panTo(latLng);
+}
 
-
-function setClickEvents(map) {
-  map.addListener('click', function(mouse) {
-    const latLng = mouse.latLng;
-    setCommentMarker(latLng, map);
-    map.panTo(latLng);
+function setMapClickEvents() {
+  MAP.addListener('click', function(e) {
+    var coords = e.latLng;
+    makeTempMarker(coords);
+    MAP.panTo(coords);
   });
 }
 
@@ -376,15 +503,25 @@ function setClickEvents(map) {
  *Stores the most recently added marker to the map which has not
  *been uploaded to the server yet.
  */
-var newMarker = null;
+var tempMarker = null;
 
 /**
- * Adds a marker to the map where clicked and removes the previous newMarker
+ * Adds a marker to the map where clicked and removes the previous tempMarker
  * when applicable
  */
-function setCommentMarker(latLng, map) {
-  if (newMarker) {
-    newMarker.setMap(null);
+function makeTempMarker(latLng) {
+  if (tempMarker) {
+    tempMarker.setMap(null);
   }
-  newMarker = makeMarker(latLng, map)
+  tempMarker = makeMarker(latLng, /**visible=*/ true);
+  tempMarker.setDraggable(true);
+
+  // clicking on a temp marker deletes it from the map
+  tempMarker.addListener("click", () => {
+    tempMarker.setMap(null);
+  });
+
+  tempMarker.addListener('dragend', () => {
+    MAP.panTo(tempMarker.getPosition());
+  });
 }

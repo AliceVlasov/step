@@ -15,19 +15,17 @@
 package com.google.sps.data;
 
 /** An item on a todo list. */
-public final class Comment {
+public final class Marker {
 
   private final long id;
-  private final String commentText;
-  private final String commentAuthor;
-  private final long markerId;
-  private final long timestamp;
+  private final boolean visible;
+  private final double lat;
+  private final double lng;
 
-  public Comment(long id, String commentText, String commentAuthor, long markerId, long timestamp) {
+  public Marker(long id, boolean visible, double lat, double lng) {
     this.id = id;
-    this.commentText = commentText;
-    this.commentAuthor = commentAuthor;
-    this.markerId = markerId;
-    this.timestamp = timestamp;
+    this.visible = visible;
+    this.lat = lat;
+    this.lng = lng;
   }
 }

@@ -46,25 +46,36 @@ public class ListCommentsServlet extends HttpServlet {
    * @return the three most recent comments in json format
    */
   public String getJson (int maxComments){
+    // only uncomment if something goes wrong with comments
+    /*
+    DatastoreService datastore = DatastoreServiceFactory.getDatastoreService();
+    // get all comment entities from Datastore
+    Query query = new Query("Comment");
+    PreparedQuery results = datastore.prepare(query);
+    
+    for (Entity entity : results.asIterable()) {
+      datastore.delete(entity.getKey());
+    } 
+    */
+
     List<Comment> comments = new ArrayList<>();
     DatastoreService datastore = DatastoreServiceFactory.getDatastoreService();
     
     // get all comment entities from Datastore
     Query query = new Query("Comment").addSort("timestamp", SortDirection.DESCENDING);
     PreparedQuery results = datastore.prepare(query);
-
+    
     // retrieve text content of the comments
     for (Entity entity : results.asIterable()) {
       long id = entity.getKey().getId();
       String commentText = (String) entity.getProperty("comment-text");
       String commentAuthor = (String) entity.getProperty("comment-author");
+      long markerId = (long) entity.getProperty("marker-id");
       long timestamp = (long) entity.getProperty("timestamp");
-
-      Comment comment = new Comment(id, commentText, commentAuthor, timestamp);
+      Comment comment = new Comment(id, commentText, commentAuthor, markerId, timestamp);
       comments.add(comment);
       if (comments.size() == maxComments) break;
     }
-
     // convert to json
     Gson gson = new Gson();
     String json = gson.toJson(comments);
