@@ -24,6 +24,7 @@ const TAB_SELECTED_CLASS = 'tabSelected';
 const TAB_CLASS = 'tab';
 
 function setUp() {
+    loadLogin();
     setTabEvents();
     setInfoEvents();
     createMap();
@@ -312,13 +313,11 @@ function updateComments() {
   }
 
   const latLng = tempMarker? tempMarker.getPosition(): DEFAULT_COORDS;
-  console.log(latLng.toString());
 
   const params = new URLSearchParams();
   params.append('lat', latLng.lat());
   params.append('lng', latLng.lng());
   params.append('visible', true);
-  console.log(params);
   tempMarker.setMap(null);
 
   fetch('/markers', {method:'POST', body: params})
@@ -446,7 +445,6 @@ function createMap() {
  */
 function loadMarker(comment, commentElement) {
   const markerId = comment.markerId;
-  console.log(markerId);
   const marker = fetch(`/markers?id=${markerId}`);
   marker.then(response => response.json()).then((marker) => { 
       makeMarker ({lat: marker.lat, lng: marker.lng}, 
@@ -524,4 +522,35 @@ function makeTempMarker(latLng) {
   tempMarker.addListener('dragend', () => {
     MAP.panTo(tempMarker.getPosition());
   });
+}
+
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+// AUTHENTICATION FUNCTIONS
+
+function loadLogin() {
+  fetch("/login").then(response => response.json()).then((user) => {
+    userCustomization(user);
+  });
+}
+
+/**
+ * responsible for change appearance and accessibility of website when logged it
+ */
+function userCustomization(user) {
+  //TODO: keep form and delete button objects but disable them when logged out
+  //TODO: opposite when logged in;
+  if (user.loggedIn) {
+    customizeWelcome(user.email, "Logout", user.toggleLoginURL);
+  } else {
+    customizeWelcome("Stranger", "Login", user.toggleLoginURL);
+  }
+  homeBody.innerHTML ("<p>Hello " + userEmail + "!</p>");
+  response.getWriter().println("<p>Logout <a href=\"" + logoutUrl + "\">here</a>.</p>");
+}
+
+function customizeWelcome(email, linkText, url) {
+  const welcome = document.getElementById("welcome");
+  const loginArea = document.getElementById("loginArea");
+  welcome.innerHTML = `<p>Hello ${email}!</p>`;
+  loginArea.innerHTML = `<p>${linkText} <a href="${url}">here</a>.</p>`;
 }

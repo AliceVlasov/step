@@ -14,18 +14,16 @@
 
 package com.google.sps.data;
 
-/** A permanent marker on the map associated with a comment. */
-public final class Marker {
+/** Website user details */
+public final class User {
 
-  private final long id;
-  private final boolean visible;
-  private final double lat;
-  private final double lng;
+  private String email;
+  private boolean loggedIn;
+  private String toggleLoginURL;
 
-  public Marker(long id, boolean visible, double lat, double lng) {
-    this.id = id;
-    this.visible = visible;
-    this.lat = lat;
-    this.lng = lng;
+  public User(String email, boolean loggedIn, String toggleLoginURL) {
+    this.email = email;
+    this.loggedIn = loggedIn;
+    this.toggleLoginURL = toggleLoginURL;
   }
 }
