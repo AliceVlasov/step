@@ -23,8 +23,19 @@ const TAB_SELECTED_CLASS = 'tabSelected';
 /** Class name for .tab objects */
 const TAB_CLASS = 'tab';
 
+/**Determines how client can see and interact with content */
+var loggedIn = false;
+
 function setUp() {
-    loadLogin();
+    fetch("/login")
+      .then(response => response.json())
+      .then(user => {
+        userCustomization(user);
+        setContent();
+      });
+}
+
+function setContent() {
     setTabEvents();
     setInfoEvents();
     createMap();
@@ -172,7 +183,8 @@ function getContent(header) {
  */
 function getComments() {
   const comments = fetch(`/list-comments?vis=${getVis()}`);
-  comments.then(response => response.json()).then((comments) => { 
+  comments.then(response => response.json())
+          .then((comments) => { 
             handleGivenComments(comments)
           });
 }
@@ -261,12 +273,16 @@ function makeDeleteButton(comment, commentElement) {
   const button = document.createElement('div');
   button.innerHTML = '<i class="far fa-trash-alt"></i>';
   button.classList.add("deleteButton");
-  button.addEventListener('click', () => {
-    deleteMarker(comment.markerId);
-    deleteComment(comment);
-    commentElement.remove();
-  });
-
+  if (loggedIn) {
+    button.addEventListener('click', () => {
+      deleteMarker(comment.markerId);
+      deleteComment(comment);
+      commentElement.remove();
+    });
+  }
+  else {
+    button.classList.add("disabledDelete");
+  }
   return button;
 }
 
@@ -490,11 +506,14 @@ function placeMarkerAndPanTo(latLng, map) {
 }
 
 function setMapClickEvents() {
-  MAP.addListener('click', function(e) {
-    var coords = e.latLng;
-    makeTempMarker(coords);
-    MAP.panTo(coords);
-  });
+  console.log(loggedIn);
+  if (loggedIn) {
+    MAP.addListener('click', function(e) {
+      var coords = e.latLng;
+      makeTempMarker(coords);
+      MAP.panTo(coords);
+    });
+  }
 }
 
 /**
@@ -527,30 +546,46 @@ function makeTempMarker(latLng) {
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 // AUTHENTICATION FUNCTIONS
 
-function loadLogin() {
-  fetch("/login").then(response => response.json()).then((user) => {
-    userCustomization(user);
-  });
-}
-
 /**
  * responsible for change appearance and accessibility of website when logged it
  */
 function userCustomization(user) {
   //TODO: keep form and delete button objects but disable them when logged out
   //TODO: opposite when logged in;
+  console.log("first");
   if (user.loggedIn) {
+    loggedIn = true;
     customizeWelcome(user.email, "Logout", user.toggleLoginURL);
   } else {
+    loggedIn = false;
     customizeWelcome("Stranger", "Login", user.toggleLoginURL);
+    disableContent();
   }
-  homeBody.innerHTML ("<p>Hello " + userEmail + "!</p>");
-  response.getWriter().println("<p>Logout <a href=\"" + logoutUrl + "\">here</a>.</p>");
 }
 
+/**
+ * Displays customized content for logged-in and anonymous clients
+ */
 function customizeWelcome(email, linkText, url) {
   const welcome = document.getElementById("welcome");
   const loginArea = document.getElementById("loginArea");
   welcome.innerHTML = `<p>Hello ${email}!</p>`;
   loginArea.innerHTML = `<p>${linkText} <a href="${url}">here</a>.</p>`;
+}
+
+/**
+ * Disables all inputs and changes placeholder text to instruct the user login
+ * in order to submit a comment
+ */
+function disableContent() {
+  const inputComment = document.getElementById("inputComment");
+  inputComment.setAttribute("placeholder", "Login to submit a comment.");
+  const inputName = document.getElementById("inputName");
+  inputName.setAttribute("placeholder", "");
+  const formElements = [inputName, inputComment, 
+      document.getElementById("submitBtn")];
+
+  for (const el of formElements) {
+    el.setAttribute("disabled", "disabled");
+  }
 }

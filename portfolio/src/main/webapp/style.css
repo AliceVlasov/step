@@ -332,16 +332,21 @@ html, body {
 }
 
 .deleteButton, .locationTag {
-  width: 2.5%;
+  width: 1em;
   float: right;
-  margin: 2.5% 2.5% 2.5% 0;
+  margin: 1em 1em 1em 0;
   text-align: center;
   cursor: pointer;
 }
 
+.disabledDelete {
+  color: gray;
+  cursor: default;
+}
+
 .commentAuthor {
   float: left;
-  width: 90%;
+  width: calc(100% - 4em);
 }
 
 #commentsVisible {

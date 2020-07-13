@@ -29,7 +29,7 @@ public class HomeServlet extends HttpServlet {
 
   @Override
   public void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
-    response.setContentType("text/html");
+    response.setContentType("text/json");
 
     Gson gson = new Gson();
     User user;
