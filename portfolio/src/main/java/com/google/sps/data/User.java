@@ -14,20 +14,26 @@
 
 package com.google.sps.data;
 
-/** A comment left by a user*/
-public final class Comment {
+/** Website user details */
+public final class User {
 
-  private final long id;
-  private final String commentText;
-  private final long markerId;
-  private final String userId;
-  private final long timestamp;
+  private String email;
+  private String id;
+  private String nickname;
+  private boolean loggedIn;
+  private String toggleLoginURL;
 
-  public Comment(long id, String commentText, long markerId, String userId, long timestamp) {
+  public User(String email, String id, String nickname, boolean loggedIn, String toggleLoginURL) {
+    this.email = email;
     this.id = id;
-    this.commentText = commentText;
-    this.markerId = markerId;
-    this.userId = userId;
-    this.timestamp = timestamp;
+    this.nickname = nickname;
+    this.loggedIn = loggedIn;
+    this.toggleLoginURL = toggleLoginURL;
+  }
+
+  public User(String id, String nickname, boolean loggedIn) {
+    this.id = id;
+    this.nickname = nickname;
+    this.loggedIn = loggedIn;
   }
 }

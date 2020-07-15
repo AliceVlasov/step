@@ -14,20 +14,18 @@
 
 package com.google.sps.data;
 
-/** A comment left by a user*/
-public final class Comment {
+/** A permanent marker on the map associated with a comment. */
+public final class Marker {
 
   private final long id;
-  private final String commentText;
-  private final long markerId;
-  private final String userId;
-  private final long timestamp;
+  private final boolean visible;
+  private final double lat;
+  private final double lng;
 
-  public Comment(long id, String commentText, long markerId, String userId, long timestamp) {
+  public Marker(long id, boolean visible, double lat, double lng) {
     this.id = id;
-    this.commentText = commentText;
-    this.markerId = markerId;
-    this.userId = userId;
-    this.timestamp = timestamp;
+    this.visible = visible;
+    this.lat = lat;
+    this.lng = lng;
   }
 }

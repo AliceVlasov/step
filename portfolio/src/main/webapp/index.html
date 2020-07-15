@@ -6,6 +6,7 @@
     <title>My Portfolio</title>
     <script src="https://kit.fontawesome.com/f6989db744.js" crossorigin="anonymous"></script>
     <link rel="stylesheet" href="style.css">
+    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBUyubsh_w0yAMgwLNTrAa2sQ5H1kqshJg"></script>
     <script src="script.js"></script>
   </head>
 
@@ -52,12 +53,13 @@
               class="tabContent tabPicture tabSelected"> </div>
         </div>
         <div id="textWrapper">
-          <div title="Welcome Tab" class="tabContent tabText tabSelected">
-            <h1>HELLO</h1>
+          <div title="Welcome Tab" class="tabContent tabText tabSelected" id="welcomeTab">
+            <div id="welcome"></div>
             <p>Welcome to my portfolio!</p>
             <p>Checkout the tabs to learn a bit about me :D, and be sure to scroll through the gallery to see some of my favourite photos 
                 from the last few years!
             </p>
+            <div id="loginArea"></div>
           </div>
           
           <div title="General Tab" class="tabContent tabText">
@@ -359,10 +361,11 @@
           <div id="commentsSection">
             <h1>Share your thoughts!</h1>
             <div id="commentsBody">
+              <div id="map"></div>
               <form id="commentForm">
-                <input id="inputName" type="text" name="name" placeholder="Name" required>
+                <input id="inputName" type="text" name="name" required>
                 <textarea id="inputComment" type="text" name="comment-text" placeholder="Leave a comment" required></textArea>
-                <input id="submitBtn" type="button" value="Submit" onclick="updateComments()">
+                <input id="submitBtn" type="button" value="Submit">
               </form>
               <div id="rightColumn">
                 <form id="commentsVisible">

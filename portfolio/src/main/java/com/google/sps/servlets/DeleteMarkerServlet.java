@@ -16,31 +16,24 @@ package com.google.sps.servlets;
 
 import com.google.appengine.api.datastore.DatastoreService;
 import com.google.appengine.api.datastore.DatastoreServiceFactory;
-import com.google.appengine.api.datastore.Entity;
+import com.google.appengine.api.datastore.Key;
+import com.google.appengine.api.datastore.KeyFactory;
 import java.io.IOException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-/** Servlet responsible for creating new comments. */
-@WebServlet("/new-comment")
-public class NewCommentServlet extends HttpServlet {
+/** Servlet responsible for deleting tasks. */
+@WebServlet("/delete-marker")
+public class DeleteMarkerServlet extends HttpServlet {
 
   @Override
   public void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException {
-    String commentText = (String) request.getParameter("comment-text");
-    long markerId = Long.parseLong(request.getParameter("marker-id"));
-    String userId = (String) request.getParameter("user-id");
-    long timestamp = System.currentTimeMillis();
+    long id = Long.parseLong(request.getParameter("id"));
 
-    Entity commentEntity = new Entity("Comment");
-    commentEntity.setProperty("comment-text", commentText);
-    commentEntity.setProperty("marker-id", markerId);
-    commentEntity.setProperty("user-id", userId);
-    commentEntity.setProperty("timestamp", timestamp);
-
+    Key markerEntityKey = KeyFactory.createKey("Marker", id);
     DatastoreService datastore = DatastoreServiceFactory.getDatastoreService();
-    datastore.put(commentEntity);
+    datastore.delete(markerEntityKey);
   }
 }

@@ -23,9 +23,25 @@ const TAB_SELECTED_CLASS = 'tabSelected';
 /** Class name for .tab objects */
 const TAB_CLASS = 'tab';
 
+/**Determines how client can see and interact with content */
+var loggedIn;
+
+/**The user entity containing the current user's id and nickname */
+var user;
+
 function setUp() {
+    fetch("/user-login")
+      .then(response => response.json())
+      .then(currUser => user = currUser)
+      .then(userCustomization)
+      .then(setContent);
+}
+
+function setContent() {
     setTabEvents();
     setInfoEvents();
+    setFormEvents();
+    createMap();
     getComments();
 }
 
@@ -162,16 +178,18 @@ function getContent(header) {
   return header.nextElementSibling;
 }
 
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 // Servlet functions
 
 /**
  * Fetches a message from the server and adds it to the DOM
  */
 function getComments() {
-  const comments = fetch(`/list-comments?vis=${getVis()}`);
-  comments.then(response => response.json()).then((comments) => { 
-            handleGivenComments(comments)
-          });
+  fetch(`/list-comments?vis=${getVis()}`)
+      .then(response => response.json())
+      .then((comments) => { 
+        handleGivenComments(comments);
+      });
 }
 
 /**
@@ -179,7 +197,13 @@ function getComments() {
  */
 function handleGivenComments(comments) {
   for (var i = 0; i < comments.length; i++) {
-    addCommentToDom(comments[i]);
+    const comment = comments[i];
+    //get the comment author's nickname and then create
+    // the comment element and marker
+    fetch(`/get-user?id=${comment.userId}`)
+      .then(response => response.json())
+      .then(author => addCommentToDom(author.nickname, comment))
+      .then(el => loadMarker(comment, el));
   }
 }
 
@@ -189,32 +213,61 @@ const COMMENTS_DISPLAY = "commentsDisplay";
 /**
  * Adds the comment to the page
  */
-function addCommentToDom(comment) {
+function addCommentToDom(author, comment) {
   const commentDisplay = document.getElementById(COMMENTS_DISPLAY);
-  const el = makeCommentElement
-    (comment, comment.commentText, comment.commentAuthor);
-
-  // add the new elements to the comment Display
-  commentDisplay.appendChild(el);
-}
-
-/**
- * @return HTML div element containing the comment with relevant information and styling
- */
-function makeCommentElement(comment, text, author) {
   const commentElement = document.createElement("div");
 
   /**Class name to style all comment blocks */
   const COMMENT_CLASS = "comment";
 
   commentElement.classList.add(COMMENT_CLASS);
-  
-  commentElement.appendChild(makeDeleteButton(comment, commentElement));
-  commentElement.appendChild(makeCommentAuthorElement(author));
-  commentElement.appendChild(makeCommentTextElement(text));
+  var userComment = false;
+  if (loggedIn && comment.userId === user.id) {
+    commentElement.appendChild(makeDeleteButton(comment, commentElement));
+    commentElement.appendChild(makeEditButton(comment, commentElement));
+    userComment = true;
+   }
 
+  let addElement = function(el) {commentElement.appendChild(el)}; 
+  addElement(makeLocationButton(comment, commentElement));
+  addElement(makeCommentAuthorElement(author, userComment));
+  addElement(makeCommentTextElement(comment.commentText));
+
+  commentDisplay.appendChild(commentElement);
   return commentElement;
 }
+
+/**
+ * @return location button element
+ */
+ function makeLocationButton(comment, commentElement) {
+   const button = document.createElement('div');
+   button.innerHTML = '<i class="fas fa-map-marker-alt"></i>';
+   button.classList.add("locationTag");
+   button.addEventListener('click', () => {
+     selectCommentMarkerPair(comment.markerId, commentElement);
+   });
+   return button;
+ }
+
+  /**
+   * Pans the map to this marker and highlights the comment Element
+   */
+ function selectCommentMarkerPair(markerId, commentElement) {
+  const SELECTED_COMMENT = "selectedComment"
+  //center this marker on the map
+  const marker = getMarker(markerId);
+  MAP.panTo(marker.getPosition());
+
+  const prevSelectedComment = 
+    document.getElementsByClassName(SELECTED_COMMENT)[0];
+    if (prevSelectedComment) {
+      prevSelectedComment.classList.remove(SELECTED_COMMENT);
+    }   
+  commentElement.classList.add(SELECTED_COMMENT); 
+  //TODO: make comments section scroll to this comment object;
+ }
+
 
 /**
  * @return delete button element
@@ -224,12 +277,71 @@ function makeDeleteButton(comment, commentElement) {
   button.innerHTML = '<i class="far fa-trash-alt"></i>';
   button.classList.add("deleteButton");
   button.addEventListener('click', () => {
-    deleteComment(comment);
-    commentElement.remove();
+    deleteCommentElements(comment, commentElement);
+  });
+  return button;
+}
+
+/**
+ * @return edit button element
+ */
+function makeEditButton(comment, commentElement) {
+  const button = document.createElement('div');
+  button.innerHTML = '<i class="fas fa-pencil-alt"></i>';
+  button.classList.add("editButton");
+
+  button.addEventListener('click', () => {
+    setEditingState(comment, commentElement);
+    makeTempMarker(getMarker(comment.markerId).getPosition());
+    deleteMarker(comment.markerId);
+    setFormContent(comment.commentText);
   });
 
   return button;
 }
+
+/**Stores the comment object being edited */
+var editedComment;
+
+/**
+ * formats the comment element so the client can see it is
+ * being edited and stores the commment object in editedComment
+ * for use in updateComments()
+ */
+function setEditingState(comment, commentElement) {
+  commentElement.id = "editing";
+  commentElement.lastElementChild.innerText="editing...";
+  const nameInput = document.getElementById("inputName");
+  nameInput.value = user.nickname;
+  editedComment = comment;
+}
+
+/**Retrieves the Marker object from permMarkers */
+function getMarker(markerId) {
+  return permMarkers[`${markerId}`];
+}
+
+/**
+ * Add comment text to the form
+ */
+function setFormContent(commentText) {
+  const form = document.getElementById("inputComment");
+  form.value = commentText;
+}
+
+/**
+ * Deletes the marker, marker entity, comment entity, and comment element
+ * associated with the clicked comment
+ * @return Promise of deleting the comment and marker entities from their servers
+ */
+function deleteCommentElements(comment, commentElement) {
+  commentElement.remove();
+  const marker = getMarker(comment.markerId);
+  marker.setMap(null);
+  deleteMarker(comment.markerId);
+  deleteComment(comment);
+}
+
 
 /**
  * @return HTML paragraph containing the comment text
@@ -248,33 +360,126 @@ function makeCommentTextElement(text) {
 /**
  * @return HTML paragraph containing the author's name
  */
-function makeCommentAuthorElement(author) {
-  const commentAuthor = document.createElement("p");
-  commentAuthor.innerText = `@${author}`;
-
-  /**Class name to style the comment author name */
-  const COMMENT_AUTHOR = "commentAuthor";
-  commentAuthor.classList.add(COMMENT_AUTHOR);
-
-  return commentAuthor;
+function makeCommentAuthorElement(author, isUserComment) {
+  const authorElement = document.createElement("p");
+  const authorFormat = `@${author}`;
+  if (isUserComment) {
+    authorElement.innerText = authorFormat+` (Me)`;
+    authorElement.classList.add("myComment");
+  } else {
+    authorElement.innerText = authorFormat;
+    authorElement.classList.add("commentAuthor");
+  }
+      
+  return authorElement;
 }
 
 /**
- * Inserts new comment into the comment Display
+ * Sets submit functionality to the form
  */
-function updateComments() {
-  var commentText = clearFormValue("inputComment");
-  var commentAuthor = clearFormValue("inputName");
-  if (validComment(commentText)) {
-    const params = new URLSearchParams();
-    params.append('comment-text', commentText);
-    params.append('comment-author', commentAuthor);
-    fetch('new-comment', {method: 'POST', body: params}).then(refreshComments);
-  }
+function setFormEvents() {
+  const submitBtn = document.getElementById("submitBtn");
+  submitBtn.addEventListener("click", function() {
+    updateComments();
+  });
 }
 
+/**
+ * Gets form input and uploads a new marker and, when applicable, 
+ * a new comment
+ */
+function updateComments() { 
+  //retrieve form values
+  var commentText = clearFormValue("inputComment");
+  var commentAuthor = clearFormValue("inputName");
+
+  //TODO: replace loading map and comments with "loading..."
+  if (!validComment(commentText)) {
+    alert("invalid comment");
+    return;
+  }
+  
+  var isCustomMarker = true;
+  //get the temp marker position
+  if (!tempMarker) {
+    tempMarker = new google.maps.Marker({position:DEFAULT_COORDS, map:MAP});
+    isCustomMarker = false;
+  }
+
+  var latLng = tempMarker.getPosition();
+
+  // prep the new marker Entity parameters
+  const params = new URLSearchParams();
+  params.append('lat', latLng.lat());
+  params.append('lng', latLng.lng());
+  params.append('visible', isCustomMarker);
+  tempMarker.setMap(null);
+
+  //post the marker to the servlet and get it's id before uploading the comment
+  fetch('/markers', {method:'POST', body: params})
+    .then(response => response.text()).then((idText) => {
+      const markerId = parseInt(idText);
+      // check if this form submission is intended to edit an existing comment
+      if (editedComment) {
+        editComment(markerId, commentText, commentAuthor);
+      } else {
+        uploadNewComment(markerId, commentText, commentAuthor);
+      }
+    });
+}
+
+/**
+ * Removes "editing" state from the editedComment and updates the comment 
+ * entity in datastore
+ */
+function editComment(markerId, commentText, commentAuthor) {
+  const commentTextElement = document.getElementById("editing");
+  commentTextElement.removeAttribute("id");
+
+  const params = new URLSearchParams();
+  params.append('comment-text', commentText);
+  console.log("editComment: marker-id="+markerId);
+  params.append('marker-id', markerId);
+  params.append('id', editedComment.id);
+  console.log("editedCommentId: "+editedComment.id);
+  editedComment = null;
+
+  postCommentToServlet('/edit-comment', params, commentAuthor);
+}
+
+/**
+ * uploads the values to the new-comment server
+ */
+function uploadNewComment(markerId, commentText, commentAuthor) {
+  const params = new URLSearchParams();
+  params.append('comment-text', commentText);
+  params.append('user-id', user.id);
+  params.append('marker-id', markerId);
+
+  postCommentToServlet('/new-comment', params, commentAuthor);
+}
+
+/**
+ * posts the given comment information to the given servlet,
+  * and updates the user's nickname appropriately
+ */
+function postCommentToServlet(servlet, params, commentAuthor) {
+    fetch(servlet, {method: 'POST', body: params})
+    .then(() => {
+      if (user.nickname != commentAuthor) {
+        console.log("updating");
+        updateNickname(commentAuthor, user.id);
+      }
+      refreshComments();
+    });
+}
+
+/**
+ * clears all displayed comments and adds back an updated list of comments
+ */
 function refreshComments() {
     clearComments();
+    clearMarkers();
     getComments();
 }
 
@@ -306,7 +511,7 @@ function getVis() {
 /**
  * Deletes all existing commentelements
  */
-function clearComments() {
+function clearComments() { // TODO: just replace with innerHTML = "";
   const commentDisplay = document.getElementById(COMMENTS_DISPLAY);
   var child = commentDisplay.lastElementChild;
   while (child) {
@@ -314,12 +519,211 @@ function clearComments() {
     child = commentDisplay.lastElementChild;
   }
 }
+/**
+ * Removes all visible markers from the map and clears the permMarkers object
+ */
+function clearMarkers() {
+  if (tempMarker) tempMarker.setMap(null);
+  for (const id in permMarkers) {
+    permMarkers[id].setMap(null);
+    delete permMarkers[id];
+  }
+}
 
 /**
  * Deletes the given comment from the page and server
+ * @return Promise from deleting the comment entity from /delete-comment
  */
 function deleteComment (comment) {
   const params = new URLSearchParams();
   params.append('id', comment.id);
-  fetch('/delete-comment', {method: 'POST', body:params}).then(refreshComments);
+  fetch('/delete-comment', {method: 'POST', body:params})
+        .then(refreshComments);
+}
+
+/**
+ * Deletes the given comment from the page and server
+ * @return Promise from deleting the marker entity from /delete-marker
+ */
+function deleteMarker (markerId) {
+  const marker = getMarker(markerId);
+  marker.setMap(null);
+
+  const params = new URLSearchParams();
+  params.append('id', markerId);
+  fetch('/delete-marker', {method: 'POST', body:params});
+}
+
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+// MAP FUNCTIONS
+
+/** The map object on the comments page*/
+var MAP = null;
+
+/**
+ * Default coordinates to center the map and for comments with no
+ * location tag 
+ */
+const DEFAULT_COORDS = {lat:43.65, lng:-79.38};
+
+/**
+ * Makes an instance of a Map and sets map-related events
+ */
+function createMap() {
+  MAP = new google.maps.Map(
+    document.getElementById('map'), 
+      {center: DEFAULT_COORDS, zoom: 8});     
+  setMapClickEvents();
+}
+
+/**
+ * Fetches the marker for this comment and adds it to the map
+ */
+function loadMarker(comment, commentElement) {
+  const markerId = comment.markerId;
+  const marker = fetch(`/markers?id=${markerId}`);
+  marker.then(response => response.json()).then((marker) => { 
+      makeMarker ({lat: marker.lat, lng: marker.lng}, 
+        marker.visible, commentElement, markerId);
+    });     
+}
+
+/**array to hold all the visible markers, their ids and Marker objects */
+const permMarkers = {};
+
+/**
+ * @param {latLng} latLng coordinates of the marker
+ * @param {boolean} visible whether or not the client should be able to interact with this marker
+ * @param {HTML element} commentElement optional parameter indicating connected comment object
+ * @param {long} id optional parameter to set marker id
+ * @return the Marker object added to the map
+ */
+function makeMarker(latLng, visible, commentElement, markerId) {
+  var marker = new google.maps.Marker({position: latLng, map: MAP});
+  if (!visible) {
+    marker.setVisible(false);
+    marker.setClickable(false);
+  }
+  if (markerId) {
+    permMarkers[`${markerId}`] = marker;
+    marker.addListener("click", function() {
+      selectCommentMarkerPair(markerId, commentElement);
+    });
+  }
+  return marker;
+}
+
+/**
+ * Allows client to click on the map repeatedly to choose on location
+ * to tag to their comment
+ */
+function placeMarkerAndPanTo(latLng, map) {
+  var marker = new google.maps.Marker({
+    position: latLng,
+    map: map
+  });
+  map.panTo(latLng);
+}
+
+function setMapClickEvents() {
+  if (loggedIn) {
+    MAP.addListener('click', function(e) {
+      var coords = e.latLng;
+      makeTempMarker(coords);
+    });
+  }
+}
+
+/**
+ *Stores the most recently added marker to the map which has not
+ *been uploaded to the server yet.
+ */
+var tempMarker = null;
+
+/**
+ * Adds a marker to the map where clicked and removes the previous tempMarker
+ * when applicable
+ */
+function makeTempMarker(latLng) {
+  if (tempMarker) {
+    tempMarker.setMap(null);
+  }
+  tempMarker = makeMarker(latLng, /**visible=*/ true);
+  tempMarker.setDraggable(true);
+
+  // clicking on a temp marker deletes it from the map
+  tempMarker.addListener("click", () => {
+    tempMarker.setMap(null);
+  });
+
+  tempMarker.addListener('dragend', () => {
+    MAP.panTo(tempMarker.getPosition());
+  });
+  MAP.panTo(latLng);
+}
+
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+// AUTHENTICATION FUNCTIONS
+
+/**
+ * responsible for change appearance and accessibility of website when logged it
+ */
+function userCustomization() {
+  if (user.loggedIn) {
+    loggedIn = true;
+    customizeWelcome("Logout", user.nickname);
+  } else {
+    loggedIn = false;
+    customizeWelcome("Login", user.nickname);
+    customizeForm(user.nickname);
+    disableContent();
+  }
+}
+
+/**
+ * Displays customized content for logged-in and anonymous clients
+ */
+function customizeWelcome(linkText, nickname) {
+  const welcome = document.getElementById("welcome");
+  const loginArea = document.getElementById("loginArea");
+
+  welcome.innerHTML = `<h1>Hello ${user.nickname}!</h1>`;
+  loginArea.innerHTML = `<p>${linkText} <a href="${user.toggleLoginURL}">here</a>.</p>`;
+}
+
+/**
+ * Disables all inputs and changes placeholder text to instruct the user login
+ * in order to submit a comment
+ */
+function disableContent() {
+  const inputComment = document.getElementById("inputComment");
+  inputComment.setAttribute("placeholder", "Login to submit a comment.");
+  const inputName = document.getElementById("inputName");
+  inputName.setAttribute("placeholder", "");
+  const formElements = [inputName, inputComment, 
+      document.getElementById("submitBtn")];
+
+  for (const el of formElements) {
+    el.setAttribute("disabled", "disabled");
+  }
+}
+
+/**
+ * Retrieves the user entity and updates its nickname
+ */
+function updateNickname(nickname, userId) {
+  const params = new URLSearchParams();
+  fetch(`/user-login?id=${userId}&nickname=${nickname}`, {method: 'POST', body:params}).then(() => {
+    customizeWelcome("Logout", nickname);
+    customizeForm(nickname);
+  });
+}
+
+/**
+ * Automatically fills the name entry of the comments form
+ * with the user's set nickname
+ */
+function customizeForm(nickname) {
+  const nameInput = document.getElementById("inputName");
+  nameInput.setAttribute("value", nickname);
 }
