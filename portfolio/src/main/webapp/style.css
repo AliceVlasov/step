@@ -261,7 +261,7 @@ html, body {
 
 #inputName {
   display: block;
-  margin: 0 auto 2% 2%;
+  margin: 0 2% 2% 2%;
   height: 20px;
   width: 50%;
   border-radius: 10px;
@@ -294,12 +294,16 @@ html, body {
   overflow-y: auto;
 }
 
+#editing {
+  font-style: italics;
+}
+
 #commentsBody {
   display: flex;
   height: calc(100% - 60px - 3em);
 }
 
-#submitBtn, #enter {
+#submitBtn, #enter{
   display: block;
   background: white;
   border-radius: 10px;
@@ -331,7 +335,7 @@ html, body {
   float: left;
 }
 
-.deleteButton, .locationTag {
+.deleteButton, .locationTag, .editButton {
   width: 1em;
   float: right;
   margin: 1em 1em 1em 0;
@@ -347,6 +351,11 @@ html, body {
 .commentAuthor {
   float: left;
   width: calc(100% - 4em);
+}
+
+.myComment {
+  float: left;
+  width: calc(100%-6em);
 }
 
 #commentsVisible {

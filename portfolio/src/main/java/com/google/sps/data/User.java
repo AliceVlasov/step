@@ -18,11 +18,15 @@ package com.google.sps.data;
 public final class User {
 
   private String email;
+  private String id;
+  private String nickname;
   private boolean loggedIn;
   private String toggleLoginURL;
 
-  public User(String email, boolean loggedIn, String toggleLoginURL) {
+  public User(String email, String id, String nickname, boolean loggedIn, String toggleLoginURL) {
     this.email = email;
+    this.id = id;
+    this.nickname = nickname;
     this.loggedIn = loggedIn;
     this.toggleLoginURL = toggleLoginURL;
   }

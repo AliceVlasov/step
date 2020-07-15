@@ -69,10 +69,10 @@ public class ListCommentsServlet extends HttpServlet {
     for (Entity entity : results.asIterable()) {
       long id = entity.getKey().getId();
       String commentText = (String) entity.getProperty("comment-text");
-      String commentAuthor = (String) entity.getProperty("comment-author");
+      String userId = (String) entity.getProperty("user-id");
       long markerId = (long) entity.getProperty("marker-id");
       long timestamp = (long) entity.getProperty("timestamp");
-      Comment comment = new Comment(id, commentText, commentAuthor, markerId, timestamp);
+      Comment comment = new Comment(id, commentText, markerId, userId, timestamp);
       comments.add(comment);
       if (comments.size() == maxComments) break;
     }

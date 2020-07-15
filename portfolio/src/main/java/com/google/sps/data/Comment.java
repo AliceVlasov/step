@@ -19,15 +19,15 @@ public final class Comment {
 
   private final long id;
   private final String commentText;
-  private final String commentAuthor;
   private final long markerId;
+  private final String userId;
   private final long timestamp;
 
-  public Comment(long id, String commentText, String commentAuthor, long markerId, long timestamp) {
+  public Comment(long id, String commentText, long markerId, String userId, long timestamp) {
     this.id = id;
     this.commentText = commentText;
-    this.commentAuthor = commentAuthor;
     this.markerId = markerId;
+    this.userId = userId;
     this.timestamp = timestamp;
   }
 }

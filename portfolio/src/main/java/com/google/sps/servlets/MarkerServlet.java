@@ -74,7 +74,7 @@ public class MarkerServlet extends HttpServlet {
     try {
       markerEntity = datastore.get(markerEntityKey);
     } catch (Exception e){
-      throw new IllegalArgumentException("No entity with given id");
+      throw new IllegalArgumentException("No marker with id"+id);
     }
     Double lat = (double)markerEntity.getProperty("lat");
     Double lng = (double)markerEntity.getProperty("lng");

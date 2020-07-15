@@ -16,6 +16,8 @@ package com.google.sps.servlets;
 
 import com.google.appengine.api.datastore.DatastoreService;
 import com.google.appengine.api.datastore.DatastoreServiceFactory;
+import com.google.appengine.api.datastore.Key;
+import com.google.appengine.api.datastore.KeyFactory;
 import com.google.appengine.api.datastore.Entity;
 import java.io.IOException;
 import javax.servlet.annotation.WebServlet;
@@ -23,24 +25,26 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-/** Servlet responsible for creating new comments. */
-@WebServlet("/new-comment")
-public class NewCommentServlet extends HttpServlet {
+/** Servlet responsible for editing tasks. */
+@WebServlet("/edit-comment")
+public class EditCommentServlet extends HttpServlet {
 
   @Override
   public void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException {
+    long id = Long.parseLong(request.getParameter("id"));
     String commentText = (String) request.getParameter("comment-text");
     long markerId = Long.parseLong(request.getParameter("marker-id"));
-    String userId = (String) request.getParameter("user-id");
-    long timestamp = System.currentTimeMillis();
 
-    Entity commentEntity = new Entity("Comment");
+    Key commentEntityKey = KeyFactory.createKey("Comment", id);
+    DatastoreService datastore = DatastoreServiceFactory.getDatastoreService();
+    Entity commentEntity;
+    try {
+      commentEntity = datastore.get(commentEntityKey);
+    } catch (Exception e){
+      throw new IllegalArgumentException("No comment with given id: "+id);
+    }
     commentEntity.setProperty("comment-text", commentText);
     commentEntity.setProperty("marker-id", markerId);
-    commentEntity.setProperty("user-id", userId);
-    commentEntity.setProperty("timestamp", timestamp);
-
-    DatastoreService datastore = DatastoreServiceFactory.getDatastoreService();
     datastore.put(commentEntity);
   }
 }
