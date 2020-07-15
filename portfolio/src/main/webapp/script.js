@@ -197,8 +197,13 @@ function getComments() {
  */
 function handleGivenComments(comments) {
   for (var i = 0; i < comments.length; i++) {
-    const commentElement = addCommentToDom(comments[i]);
-    loadMarker(comments[i], commentElement);
+    const comment = comments[i];
+    //get the comment author's nickname and then create
+    // the comment element and marker
+    fetch(`/get-user?id=${comment.userId}`)
+      .then(response => response.json())
+      .then(author => addCommentToDom(author.nickname, comment))
+      .then(el => loadMarker(comment, el));
   }
 }
 
@@ -208,19 +213,8 @@ const COMMENTS_DISPLAY = "commentsDisplay";
 /**
  * Adds the comment to the page
  */
-function addCommentToDom(comment) {
+function addCommentToDom(author, comment) {
   const commentDisplay = document.getElementById(COMMENTS_DISPLAY);
-  const el = makeCommentElement(comment);
-
-  // add the new elements to the comment Display
-  commentDisplay.appendChild(el);
-  return el;
-}
-
-/**
- * @return HTML div element containing the comment with relevant information and styling
- */
-function makeCommentElement(comment) {
   const commentElement = document.createElement("div");
 
   /**Class name to style all comment blocks */
@@ -236,9 +230,10 @@ function makeCommentElement(comment) {
 
   let addElement = function(el) {commentElement.appendChild(el)}; 
   addElement(makeLocationButton(comment, commentElement));
-  addElement(makeCommentAuthorElement(user.nickname, userComment));
+  addElement(makeCommentAuthorElement(author, userComment));
   addElement(makeCommentTextElement(comment.commentText));
 
+  commentDisplay.appendChild(commentElement);
   return commentElement;
 }
 
@@ -366,16 +361,17 @@ function makeCommentTextElement(text) {
  * @return HTML paragraph containing the author's name
  */
 function makeCommentAuthorElement(author, isUserComment) {
-  const commentAuthor = document.createElement("p");
+  const authorElement = document.createElement("p");
+  const authorFormat = `@${author}`;
   if (isUserComment) {
-    commentAuthor.innerText = "Me";
-    commentAuthor.classList.add("myComment");
+    authorElement.innerText = authorFormat+` (Me)`;
+    authorElement.classList.add("myComment");
   } else {
-    commentAuthor.innerText = `@${author}`;
-    commentAuthor.classList.add("commentAuthor");
+    authorElement.innerText = authorFormat;
+    authorElement.classList.add("commentAuthor");
   }
-  
-  return commentAuthor;
+      
+  return authorElement;
 }
 
 /**
@@ -471,6 +467,7 @@ function postCommentToServlet(servlet, params, commentAuthor) {
     fetch(servlet, {method: 'POST', body: params})
     .then(() => {
       if (user.nickname != commentAuthor) {
+        console.log("updating");
         updateNickname(commentAuthor, user.id);
       }
       refreshComments();
@@ -674,10 +671,10 @@ function makeTempMarker(latLng) {
 function userCustomization() {
   if (user.loggedIn) {
     loggedIn = true;
-    customizeWelcome("Logout", user);
+    customizeWelcome("Logout", user.nickname);
   } else {
     loggedIn = false;
-    customizeWelcome("Login", user);
+    customizeWelcome("Login", user.nickname);
     customizeForm(user.nickname);
     disableContent();
   }
@@ -686,11 +683,11 @@ function userCustomization() {
 /**
  * Displays customized content for logged-in and anonymous clients
  */
-function customizeWelcome(linkText) {
+function customizeWelcome(linkText, nickname) {
   const welcome = document.getElementById("welcome");
   const loginArea = document.getElementById("loginArea");
 
-  welcome.innerHTML = `<p>Hello ${user.nickname}!</p>`;
+  welcome.innerHTML = `<h1>Hello ${user.nickname}!</h1>`;
   loginArea.innerHTML = `<p>${linkText} <a href="${user.toggleLoginURL}">here</a>.</p>`;
 }
 
@@ -716,7 +713,10 @@ function disableContent() {
  */
 function updateNickname(nickname, userId) {
   const params = new URLSearchParams();
-  fetch(`/user-login?id=${userId}&nickname=${nickname}`, {method: 'POST', body:params});
+  fetch(`/user-login?id=${userId}&nickname=${nickname}`, {method: 'POST', body:params}).then(() => {
+    customizeWelcome("Logout", nickname);
+    customizeForm(nickname);
+  });
 }
 
 /**
@@ -725,5 +725,5 @@ function updateNickname(nickname, userId) {
  */
 function customizeForm(nickname) {
   const nameInput = document.getElementById("inputName");
-  nameInput.value = nickname;
+  nameInput.setAttribute("value", nickname);
 }

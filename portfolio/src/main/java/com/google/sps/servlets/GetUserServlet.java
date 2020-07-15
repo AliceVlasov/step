@@ -29,49 +29,34 @@ import com.google.appengine.api.datastore.PreparedQuery;
 import com.google.appengine.api.datastore.DatastoreService;
 import com.google.appengine.api.datastore.DatastoreServiceFactory;
 
-@WebServlet("/user-login")
-public class LoginServlet extends HttpServlet {
+@WebServlet("/get-user")
+public class GetUserServlet extends HttpServlet {
 
   @Override
   public void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
     response.setContentType("text/json");
-
-    Gson gson = new Gson();
-    User user;
-    String userJson;
+    String requestedUserId = (String) request.getParameter("id");
+    
+    Entity requestedUserEntity = getUserEntity(requestedUserId);
+    String nickname = (String) requestedUserEntity.getProperty("nickname");
 
     UserService userService = UserServiceFactory.getUserService();
+    String currUserId = "";
     if (userService.isUserLoggedIn()) {
-      String userEmail = userService.getCurrentUser().getEmail();
-      String userId = (String) userService.getCurrentUser().getUserId();
-      Entity userEntity = getUserEntity(userId);
-      String nickname = (String) userEntity.getProperty("nickname");
-      
-      String urlToRedirectToAfterUserLogsOut = "/";
-      String logoutUrl = userService.createLogoutURL(urlToRedirectToAfterUserLogsOut);
-      
-      user = new User(userEmail, userId, nickname, 
-                      /*LoggedIn=*/true, logoutUrl);
-    } else {
-      String urlToRedirectToAfterUserLogsIn = "/";
-      String loginUrl = userService.createLoginURL(urlToRedirectToAfterUserLogsIn);
-
-      user = new User(null, "", "Stranger", 
-                      /*LoggedIn=*/false, loginUrl);
+      currUserId = (String) userService.getCurrentUser().getUserId();
     }
 
+    User user;
+    if (currUserId == requestedUserId) {
+      user = new User(requestedUserId, nickname, /*LoggedIn=*/true);
+    } else {
+      user = new User(requestedUserId, nickname, /*LoggedIn=*/false);
+    }
+
+    Gson gson = new Gson();
+    String userJson;
     userJson = gson.toJson(user);
     response.getWriter().println(userJson);
-  }
-
-  @Override
-  public void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException {
-    String userId = (String) request.getParameter("id");
-    String nickname = request.getParameter("nickname");
-    Entity userEntity = getUserEntity(userId);
-    userEntity.setProperty("nickname", nickname);
-    DatastoreService datastore = DatastoreServiceFactory.getDatastoreService();
-    datastore.put(userEntity);
   }
 
   /**

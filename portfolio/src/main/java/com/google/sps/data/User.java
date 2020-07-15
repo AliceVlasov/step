@@ -30,4 +30,10 @@ public final class User {
     this.loggedIn = loggedIn;
     this.toggleLoginURL = toggleLoginURL;
   }
+
+  public User(String id, String nickname, boolean loggedIn) {
+    this.id = id;
+    this.nickname = nickname;
+    this.loggedIn = loggedIn;
+  }
 }
