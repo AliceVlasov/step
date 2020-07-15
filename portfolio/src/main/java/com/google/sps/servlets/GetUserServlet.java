@@ -29,6 +29,7 @@ import com.google.appengine.api.datastore.PreparedQuery;
 import com.google.appengine.api.datastore.DatastoreService;
 import com.google.appengine.api.datastore.DatastoreServiceFactory;
 
+/**Servlet that retrieves a user's information*/
 @WebServlet("/get-user")
 public class GetUserServlet extends HttpServlet {
 

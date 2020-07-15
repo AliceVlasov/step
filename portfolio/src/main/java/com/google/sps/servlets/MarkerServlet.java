@@ -29,7 +29,7 @@ import javax.servlet.http.HttpServletResponse;
 import com.google.appengine.api.datastore.PreparedQuery;
 import com.google.appengine.api.datastore.Query;
 
-/** Servlet responsible for creating new markers. */
+/** Servlet responsible for creating and retrieving markers. */
 @WebServlet("/markers")
 public class MarkerServlet extends HttpServlet {
 
@@ -53,18 +53,6 @@ public class MarkerServlet extends HttpServlet {
 
     @Override
   public void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
-    // only uncomment if something goes wrong with markers 
-    /*
-    DatastoreService datastore = DatastoreServiceFactory.getDatastoreService();
-    // get all comment entities from Datastore
-    Query query = new Query("Marker");
-    PreparedQuery results = datastore.prepare(query);
-
-    
-   for (Entity entity : results.asIterable()) {
-      datastore.delete(entity.getKey());
-    } 
-    */
     long id = Long.parseLong(request.getParameter("id"));
 
     Key markerEntityKey = KeyFactory.createKey("Marker", id);
@@ -81,7 +69,7 @@ public class MarkerServlet extends HttpServlet {
     boolean visible = (boolean)markerEntity.getProperty("visible");
 
     Marker marker = new Marker(id, visible, lat, lng);
-
+    
     Gson gson = new Gson();
     String json = gson.toJson(marker);
 
