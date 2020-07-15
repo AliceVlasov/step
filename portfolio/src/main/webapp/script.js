@@ -399,20 +399,20 @@ function updateComments() {
     return;
   }
   
+  var isCustomMarker = true;
   //get the temp marker position
-  var latLng;
-  if (tempMarker) {
-    latLng = tempMarker.getPosition();
+  if (!tempMarker) {
+    tempMarker = new google.maps.Marker({position:DEFAULT_COORDS, map:MAP});
+    isCustomMarker = false;
   }
-  else {
-    latLng = new google.maps.LatLng(DEFAULT_COORDS); //TODO: change Default coords back
-  }
+
+  var latLng = tempMarker.getPosition();
 
   // prep the new marker Entity parameters
   const params = new URLSearchParams();
   params.append('lat', latLng.lat());
   params.append('lng', latLng.lng());
-  params.append('visible', true);
+  params.append('visible', isCustomMarker);
   tempMarker.setMap(null);
 
   //post the marker to the servlet and get it's id before uploading the comment
@@ -564,7 +564,7 @@ var MAP = null;
  * Default coordinates to center the map and for comments with no
  * location tag 
  */
-const DEFAULT_COORDS = new google.maps.LatLng(43.65, -79.38);
+const DEFAULT_COORDS = {lat:43.65, lng:-79.38};
 
 /**
  * Makes an instance of a Map and sets map-related events
@@ -601,7 +601,7 @@ const permMarkers = {};
 function makeMarker(latLng, visible, commentElement, markerId) {
   var marker = new google.maps.Marker({position: latLng, map: MAP});
   if (!visible) {
-    marker.setOptions(new MarkerOptions().visible(false));
+    marker.setVisible(false);
     marker.setClickable(false);
   }
   if (markerId) {
