@@ -31,6 +31,9 @@ public final class FindMeetingQuery {
     List<TimeRange> endSortedEvents =
         sortEvents(events, TimeRange.ORDER_BY_END);
 
+    // min duration of the available time slot
+    long minDuration = request.getDuration();
+
     // index of current position in startSortedEvents
     int startIndex = 0;
 
@@ -44,12 +47,15 @@ public final class FindMeetingQuery {
     int busyAttendees = 0;
 
     // keep track of when a possible available slot begins
-    int availableSlotStart = TimeRange.START_OF_DAY;
+    int freeSlotStart = TimeRange.START_OF_DAY;
 
     // temp variables to access event start and end times 
     // from startSorted Events and endSortedEvents
     int currStartTime;
     int currEndTime;
+
+    // temp variable to store the timeRanges where no events occur
+    TimeRange freeSlot;
 
     //go through day by iterating through times of interest
     // (when an event ends or starts)
@@ -64,14 +70,13 @@ public final class FindMeetingQuery {
           Math.min(startIndex, maxIndex-1)).start(); // startIndex could be equal to maxIndex
 
       if (startIndex == maxIndex || currEndTime <= currStartTime) { // events can only end from this point on
-        availableSlotStart = currEndTime;
+        freeSlotStart = currEndTime;
         endIndex++;  
         busyAttendees--;          
       }
       else { //an event starts now  
         if (busyAttendees == 0) { 
-          availableRanges.add(TimeRange.fromStartEnd
-              (availableSlotStart, currStartTime, false));
+          addRange(availableRanges, minDuration, freeSlotStart, currStartTime, false);
         }
         startIndex ++;
         busyAttendees++;
@@ -79,8 +84,7 @@ public final class FindMeetingQuery {
     }
 
     if (busyAttendees == 0) { //Add the time slot at the end of the day
-      availableRanges.add(TimeRange.fromStartEnd 
-        (availableSlotStart, TimeRange.END_OF_DAY, true));
+      addRange(availableRanges, minDuration, freeSlotStart, TimeRange.END_OF_DAY, true);
     }
     else {
       System.out.println("!!!!FINAL BUSY ATTENDEES ="+busyAttendees);
@@ -95,7 +99,7 @@ public final class FindMeetingQuery {
    * @param comparator comparator used to sort the event time ranges
    * @return the sorted ArrayList of TimeRanges
    */
-  private ArrayList<TimeRange> sortEvents (Collection<Event> events,Comparator<TimeRange> comparator) {
+  private ArrayList<TimeRange> sortEvents(Collection<Event> events,Comparator<TimeRange> comparator) {
     ArrayList<TimeRange> eventTimeRanges = new ArrayList<>();
 
     for (Event event: events) {
@@ -104,5 +108,22 @@ public final class FindMeetingQuery {
 
     eventTimeRanges.sort(comparator);
     return eventTimeRanges;
+  }
+
+  /**
+   * Adds the time slot to the destination if the given time slot is fits 
+   * the minimum duration
+   * @param dest where the TimeRange object should be added
+   * @param minDuration the min duration the slot requires to be added to dest
+   * @param start the start time of the slot
+   * @param end the end time of the slot
+   * @param inclusive whether the end time should be included or not in the slot
+   */
+  private void addRange(List<TimeRange> dest, long minDuration, int start, 
+      int end, boolean inclusive) {
+    TimeRange freeSlot = TimeRange.fromStartEnd(start, end, inclusive);
+    if (freeSlot.duration() >= minDuration) {
+      dest.add(freeSlot);
+    }
   }
 }
