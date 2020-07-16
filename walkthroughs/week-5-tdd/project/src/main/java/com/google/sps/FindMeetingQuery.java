@@ -18,18 +18,22 @@ import java.util.Collection;
 import java.util.Comparator;
 import java.util.List;
 import java.util.ArrayList;
+import java.util.Set;
 
 /**
- * Given a list of events, find all time slots where no events are occurring.
+ * Find all possible meeting times that satisfy the request and do not overlap with events unless event attendees are optional meeting attendees
  */
 public final class FindMeetingQuery {
   public Collection<TimeRange> query(Collection<Event> events, MeetingRequest request) {
     List<TimeRange> availableRanges = new ArrayList<>();
 
+    Collection<Event> filteredEvents = 
+        filterEventsByAttendees(request.getAttendees(), events);
+
     List<TimeRange> startSortedEvents = 
-        sortEvents(events, TimeRange.ORDER_BY_START);
+        sortEvents(filteredEvents, TimeRange.ORDER_BY_START);
     List<TimeRange> endSortedEvents =
-        sortEvents(events, TimeRange.ORDER_BY_END);
+        sortEvents(filteredEvents, TimeRange.ORDER_BY_END);
 
     // min duration of the available time slot
     long minDuration = request.getDuration();
@@ -41,7 +45,7 @@ public final class FindMeetingQuery {
     int endIndex = 0;
 
     //The maximum value startIndex and endIndex can have 
-    int maxIndex = events.size();
+    int maxIndex = filteredEvents.size();
 
     // keep track of how many attendees are busy before the current time
     int busyAttendees = 0;
@@ -94,7 +98,8 @@ public final class FindMeetingQuery {
   }
 
   /**
-   * Sorts and returns the TimeRanges of the events given using the comparator
+   * Sorts and returns the TimeRanges of the events given using the
+   * comparator
    * @param events collection of events given to the query
    * @param comparator comparator used to sort the event time ranges
    * @return the sorted ArrayList of TimeRanges
@@ -108,6 +113,39 @@ public final class FindMeetingQuery {
 
     eventTimeRanges.sort(comparator);
     return eventTimeRanges;
+  }
+
+  /**
+   * Returns a collection containing the events that include requested attendees
+   * @param requestedAttendees people of interest
+   * @param events events that need to be filtered
+   */
+  private Collection<Event> filterEventsByAttendees
+      (Collection<String> requestedAttendees, Collection<Event> events) {
+    List<Event> filteredEvents = new ArrayList<>();
+    
+    for (Event event: events) {
+      if(eventHasImportantAttendees(event.getAttendees(), requestedAttendees)) {
+        filteredEvents.add(event);
+      }
+    }
+
+    return filteredEvents;
+  }
+
+  /**
+   * Returns if any of the requested attendees are also attending an event
+   * @param eventAttendees list of people attending an event
+   * @param requestedAttendees list of people needed for the meeting
+   */
+  private boolean eventHasImportantAttendees(Set<String> eventAttendees, Collection<String> requestedAttendees) {
+    for (String requestedAttendee: requestedAttendees) {
+      if (eventAttendees.contains(requestedAttendee)) {
+        return true;
+      }
+    }
+
+    return false;
   }
 
   /**
