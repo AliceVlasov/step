@@ -29,6 +29,7 @@ import com.google.appengine.api.datastore.PreparedQuery;
 import com.google.appengine.api.datastore.DatastoreService;
 import com.google.appengine.api.datastore.DatastoreServiceFactory;
 
+/** Server that logs users in and out and updates their information*/
 @WebServlet("/user-login")
 public class LoginServlet extends HttpServlet {
 

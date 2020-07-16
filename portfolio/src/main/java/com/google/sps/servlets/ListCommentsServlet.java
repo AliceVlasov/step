@@ -30,7 +30,7 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-/** Servlet that returns some example content. TODO: modify this file to handle comments data */
+/** Servlet that returns some example content.*/
 @WebServlet("/list-comments")
 public class ListCommentsServlet extends HttpServlet {
 
@@ -46,19 +46,7 @@ public class ListCommentsServlet extends HttpServlet {
    * @return the three most recent comments in json format
    */
   public String getJson (int maxComments){
-    // only uncomment if something goes wrong with comments
-    /*
-    DatastoreService datastore = DatastoreServiceFactory.getDatastoreService();
-    // get all comment entities from Datastore
-    Query query = new Query("Comment");
-    PreparedQuery results = datastore.prepare(query);
-    
-    for (Entity entity : results.asIterable()) {
-      datastore.delete(entity.getKey());
-    } 
-    */
-
-    List<Comment> comments = new ArrayList<>();
+    List<Comment> comments = new ArrayList<>(); 
     DatastoreService datastore = DatastoreServiceFactory.getDatastoreService();
     
     // get all comment entities from Datastore
@@ -75,11 +63,11 @@ public class ListCommentsServlet extends HttpServlet {
       Comment comment = new Comment(id, commentText, markerId, userId, timestamp);
       comments.add(comment);
       if (comments.size() == maxComments) break;
-    }
+    } 
     // convert to json
     Gson gson = new Gson();
     String json = gson.toJson(comments);
 
-    return json;
+    return json; 
   }
 }

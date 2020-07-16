@@ -23,12 +23,10 @@ const TAB_SELECTED_CLASS = 'tabSelected';
 /** Class name for .tab objects */
 const TAB_CLASS = 'tab';
 
-/**Determines how client can see and interact with content */
-var loggedIn;
-
 /**The user entity containing the current user's id and nickname */
 var user;
 
+/**Retrieves the current user's information and sets up the page */
 function setUp() {
     fetch("/user-login")
       .then(response => response.json())
@@ -37,6 +35,7 @@ function setUp() {
       .then(setContent);
 }
 
+/**Sets the page's event listeners and loads markers and comments */
 function setContent() {
     setTabEvents();
     setInfoEvents();
@@ -182,7 +181,8 @@ function getContent(header) {
 // Servlet functions
 
 /**
- * Fetches a message from the server and adds it to the DOM
+ * Fetches a user-requested number of comments from the server 
+ * and displays them on the website
  */
 function getComments() {
   fetch(`/list-comments?vis=${getVis()}`)
@@ -193,13 +193,12 @@ function getComments() {
 }
 
 /**
- * Handles the comments from the server by converting them to text and giving them to addNameToDom()
+ * Parses the comment object from the server, retrieves the author's nickname
+ * and then creates and displays the comment's elements and marker
  */
 function handleGivenComments(comments) {
   for (var i = 0; i < comments.length; i++) {
     const comment = comments[i];
-    //get the comment author's nickname and then create
-    // the comment element and marker
     fetch(`/get-user?id=${comment.userId}`)
       .then(response => response.json())
       .then(author => addCommentToDom(author.nickname, comment))
@@ -211,7 +210,8 @@ function handleGivenComments(comments) {
 const COMMENTS_DISPLAY = "commentsDisplay";
 
 /**
- * Adds the comment to the page
+ * Adds the comment with author's nickname, location tag, and edit and delete
+ * buttons when applicable to the DOM
  */
 function addCommentToDom(author, comment) {
   const commentDisplay = document.getElementById(COMMENTS_DISPLAY);
@@ -221,14 +221,16 @@ function addCommentToDom(author, comment) {
   const COMMENT_CLASS = "comment";
 
   commentElement.classList.add(COMMENT_CLASS);
+
+  let addElement = function(el) {commentElement.appendChild(el)}; 
   var userComment = false;
-  if (loggedIn && comment.userId === user.id) {
-    commentElement.appendChild(makeDeleteButton(comment, commentElement));
-    commentElement.appendChild(makeEditButton(comment, commentElement));
+  if (user.loggedIn && comment.userId === user.id) {
+    addElement(makeDeleteButton(comment, commentElement));
+    addElement(makeEditButton(author, comment, commentElement));
     userComment = true;
    }
 
-  let addElement = function(el) {commentElement.appendChild(el)}; 
+  
   addElement(makeLocationButton(comment, commentElement));
   addElement(makeCommentAuthorElement(author, userComment));
   addElement(makeCommentTextElement(comment.commentText));
@@ -242,7 +244,10 @@ function addCommentToDom(author, comment) {
  */
  function makeLocationButton(comment, commentElement) {
    const button = document.createElement('div');
+   
+   //insert location tag icon
    button.innerHTML = '<i class="fas fa-map-marker-alt"></i>';
+
    button.classList.add("locationTag");
    button.addEventListener('click', () => {
      selectCommentMarkerPair(comment.markerId, commentElement);
@@ -255,16 +260,20 @@ function addCommentToDom(author, comment) {
    */
  function selectCommentMarkerPair(markerId, commentElement) {
   const SELECTED_COMMENT = "selectedComment"
-  //center this marker on the map
+  
   const marker = getMarker(markerId);
   MAP.panTo(marker.getPosition());
 
   const prevSelectedComment = 
     document.getElementsByClassName(SELECTED_COMMENT)[0];
-    if (prevSelectedComment) {
-      prevSelectedComment.classList.remove(SELECTED_COMMENT);
-    }   
-  commentElement.classList.add(SELECTED_COMMENT); 
+    
+  if (prevSelectedComment) {
+    prevSelectedComment.classList.remove(SELECTED_COMMENT);
+  }   
+
+  if (prevSelectedComment !== commentElement) {
+    commentElement.classList.add(SELECTED_COMMENT); 
+  }
   //TODO: make comments section scroll to this comment object;
  }
 
@@ -274,7 +283,10 @@ function addCommentToDom(author, comment) {
  */
 function makeDeleteButton(comment, commentElement) {
   const button = document.createElement('div');
+  
+  //insert delete icon
   button.innerHTML = '<i class="far fa-trash-alt"></i>';
+  
   button.classList.add("deleteButton");
   button.addEventListener('click', () => {
     deleteCommentElements(comment, commentElement);
@@ -283,9 +295,13 @@ function makeDeleteButton(comment, commentElement) {
 }
 
 /**
+ * When clicked, the edit button needs to modify the comment
+ * element so the client can see that it is currently being
+ * edited, replace the permanent marker with a temporary one,
+ * and get the comment details and put them in the form.
  * @return edit button element
  */
-function makeEditButton(comment, commentElement) {
+function makeEditButton(author, comment, commentElement) {
   const button = document.createElement('div');
   button.innerHTML = '<i class="fas fa-pencil-alt"></i>';
   button.classList.add("editButton");
@@ -294,7 +310,7 @@ function makeEditButton(comment, commentElement) {
     setEditingState(comment, commentElement);
     makeTempMarker(getMarker(comment.markerId).getPosition());
     deleteMarker(comment.markerId);
-    setFormContent(comment.commentText);
+    setFormContent(author, comment.commentText);
   });
 
   return button;
@@ -304,7 +320,7 @@ function makeEditButton(comment, commentElement) {
 var editedComment;
 
 /**
- * formats the comment element so the client can see it is
+ * Formats the comment element so the client can see it is
  * being edited and stores the commment object in editedComment
  * for use in updateComments()
  */
@@ -316,23 +332,26 @@ function setEditingState(comment, commentElement) {
   editedComment = comment;
 }
 
-/**Retrieves the Marker object from permMarkers */
+/**
+ * @return the Marker object with the given id 
+ */
 function getMarker(markerId) {
   return permMarkers[`${markerId}`];
 }
 
 /**
- * Add comment text to the form
+ * Add comment text and author name to the form
  */
-function setFormContent(commentText) {
+function setFormContent(author, commentText) {
   const form = document.getElementById("inputComment");
   form.value = commentText;
+  const inputAuthor = document.getElementById("inputName");
+  inputAuthor.value = author;
 }
 
 /**
  * Deletes the marker, marker entity, comment entity, and comment element
  * associated with the clicked comment
- * @return Promise of deleting the comment and marker entities from their servers
  */
 function deleteCommentElements(comment, commentElement) {
   commentElement.remove();
@@ -358,7 +377,8 @@ function makeCommentTextElement(text) {
 }
 
 /**
- * @return HTML paragraph containing the author's name
+ * @return HTML paragraph containing the author's name, and "(Me)"
+ * if this is the user's comment
  */
 function makeCommentAuthorElement(author, isUserComment) {
   const authorElement = document.createElement("p");
@@ -385,8 +405,8 @@ function setFormEvents() {
 }
 
 /**
- * Gets form input and uploads a new marker and, when applicable, 
- * a new comment
+ * Gets form input and uploads a new marker and, if a comment is not being
+ * edited, a new comment as well
  */
 function updateComments() { 
   //retrieve form values
@@ -400,7 +420,9 @@ function updateComments() {
   }
   
   var isCustomMarker = true;
-  //get the temp marker position
+  
+  //get the temp marker position or default position if the client did not 
+  // choose a location on the map
   if (!tempMarker) {
     tempMarker = new google.maps.Marker({position:DEFAULT_COORDS, map:MAP});
     isCustomMarker = false;
@@ -408,16 +430,17 @@ function updateComments() {
 
   var latLng = tempMarker.getPosition();
 
-  // prep the new marker Entity parameters
+  // prep the new marker Entity parameters and remove the temp marker
   const params = new URLSearchParams();
   params.append('lat', latLng.lat());
   params.append('lng', latLng.lng());
-  params.append('visible', isCustomMarker);
+  params.append('visible', isCustomMarker); 
   tempMarker.setMap(null);
 
-  //post the marker to the servlet and get it's id before uploading the comment
+  //post the marker to the servlet and get it's id to upload with the comment
   fetch('/markers', {method:'POST', body: params})
-    .then(response => response.text()).then((idText) => {
+    .then(response => response.text())
+    .then((idText) => {
       const markerId = parseInt(idText);
       // check if this form submission is intended to edit an existing comment
       if (editedComment) {
@@ -438,17 +461,15 @@ function editComment(markerId, commentText, commentAuthor) {
 
   const params = new URLSearchParams();
   params.append('comment-text', commentText);
-  console.log("editComment: marker-id="+markerId);
   params.append('marker-id', markerId);
   params.append('id', editedComment.id);
-  console.log("editedCommentId: "+editedComment.id);
   editedComment = null;
 
   postCommentToServlet('/edit-comment', params, commentAuthor);
 }
 
 /**
- * uploads the values to the new-comment server
+ * uploads a new comment with given parameters to the servlet
  */
 function uploadNewComment(markerId, commentText, commentAuthor) {
   const params = new URLSearchParams();
@@ -460,22 +481,21 @@ function uploadNewComment(markerId, commentText, commentAuthor) {
 }
 
 /**
- * posts the given comment information to the given servlet,
-  * and updates the user's nickname appropriately
+ * Posts the given comment information to the given servlet,
+ * and updates the user's nickname appropriately
  */
 function postCommentToServlet(servlet, params, commentAuthor) {
     fetch(servlet, {method: 'POST', body: params})
     .then(() => {
       if (user.nickname != commentAuthor) {
-        console.log("updating");
-        updateNickname(commentAuthor, user.id);
+        updateNickname(commentAuthor);
       }
       refreshComments();
     });
 }
 
 /**
- * clears all displayed comments and adds back an updated list of comments
+ * Clears all displayed comments and redownloads the updated versions
  */
 function refreshComments() {
     clearComments();
@@ -491,7 +511,7 @@ function validComment(comment) {
 }
 
 /**
- * Clears and returns the form input element
+ * @return the form input element that was deleted
  */
 function clearFormValue(id) {
    const formInput = document.getElementById(id);
@@ -509,9 +529,9 @@ function getVis() {
 }
 
 /**
- * Deletes all existing commentelements
+ * Deletes all existing comment elements
  */
-function clearComments() { // TODO: just replace with innerHTML = "";
+function clearComments() {
   const commentDisplay = document.getElementById(COMMENTS_DISPLAY);
   var child = commentDisplay.lastElementChild;
   while (child) {
@@ -519,6 +539,7 @@ function clearComments() { // TODO: just replace with innerHTML = "";
     child = commentDisplay.lastElementChild;
   }
 }
+
 /**
  * Removes all visible markers from the map and clears the permMarkers object
  */
@@ -581,8 +602,9 @@ function createMap() {
  */
 function loadMarker(comment, commentElement) {
   const markerId = comment.markerId;
-  const marker = fetch(`/markers?id=${markerId}`);
-  marker.then(response => response.json()).then((marker) => { 
+  fetch(`/markers?id=${markerId}`)
+    .then(response => response.json())
+    .then((marker) => { 
       makeMarker ({lat: marker.lat, lng: marker.lng}, 
         marker.visible, commentElement, markerId);
     });     
@@ -625,8 +647,11 @@ function placeMarkerAndPanTo(latLng, map) {
   map.panTo(latLng);
 }
 
+/**
+ * Creates a temporary and moveable marker whenever the client clicks on the map
+ */
 function setMapClickEvents() {
-  if (loggedIn) {
+  if (user.loggedIn) {
     MAP.addListener('click', function(e) {
       var coords = e.latLng;
       makeTempMarker(coords);
@@ -635,8 +660,8 @@ function setMapClickEvents() {
 }
 
 /**
- *Stores the most recently added marker to the map which has not
- *been uploaded to the server yet.
+ * Stores the most recently added marker to the map which has not
+ * been uploaded to the server yet.
  */
 var tempMarker = null;
 
@@ -648,6 +673,7 @@ function makeTempMarker(latLng) {
   if (tempMarker) {
     tempMarker.setMap(null);
   }
+
   tempMarker = makeMarker(latLng, /**visible=*/ true);
   tempMarker.setDraggable(true);
 
@@ -666,16 +692,14 @@ function makeTempMarker(latLng) {
 // AUTHENTICATION FUNCTIONS
 
 /**
- * responsible for change appearance and accessibility of website when logged it
+ * Changes appearance and accessibility of website when logged in/out
  */
 function userCustomization() {
   if (user.loggedIn) {
-    loggedIn = true;
-    customizeWelcome("Logout", user.nickname);
+    customizeWelcome("Logout");
   } else {
-    loggedIn = false;
-    customizeWelcome("Login", user.nickname);
-    customizeForm(user.nickname);
+    customizeWelcome("Login");
+    customizeForm();
     disableContent();
   }
 }
@@ -683,12 +707,13 @@ function userCustomization() {
 /**
  * Displays customized content for logged-in and anonymous clients
  */
-function customizeWelcome(linkText, nickname) {
+function customizeWelcome(linkText) {
   const welcome = document.getElementById("welcome");
   const loginArea = document.getElementById("loginArea");
 
   welcome.innerHTML = `<h1>Hello ${user.nickname}!</h1>`;
-  loginArea.innerHTML = `<p>${linkText} <a href="${user.toggleLoginURL}">here</a>.</p>`;
+  loginArea.innerHTML = 
+      `<p>${linkText} <a href="${user.toggleLoginURL}">here</a>.</p>`;
 }
 
 /**
@@ -711,9 +736,9 @@ function disableContent() {
 /**
  * Retrieves the user entity and updates its nickname
  */
-function updateNickname(nickname, userId) {
+function updateNickname(nickname) {
   const params = new URLSearchParams();
-  fetch(`/user-login?id=${userId}&nickname=${nickname}`, {method: 'POST', body:params}).then(() => {
+  fetch(`/user-login?id=${user.id}&nickname=${nickname}`, {method: 'POST', body:params}).then(() => {
     customizeWelcome("Logout", nickname);
     customizeForm(nickname);
   });
@@ -723,7 +748,7 @@ function updateNickname(nickname, userId) {
  * Automatically fills the name entry of the comments form
  * with the user's set nickname
  */
-function customizeForm(nickname) {
+function customizeForm() {
   const nameInput = document.getElementById("inputName");
-  nameInput.setAttribute("value", nickname);
+  nameInput.setAttribute("value", user.nickname);
 }
