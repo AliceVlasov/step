@@ -19,6 +19,7 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.ArrayList;
 import java.util.Set;
+import java.util.HashSet;
 
 /**
  * Find all possible meeting times that satisfy the request and do not overlap with events unless event attendees are optional meeting attendees
@@ -48,15 +49,17 @@ public final class FindMeetingQuery {
     int maxIndex = filteredEvents.size();
 
     // keep track of how many attendees are busy before the current time
-    int busyAttendees = 0;
+    List<String> busyAttendees = new ArrayList<>();
 
     // keep track of when a possible available slot begins
     int freeSlotStart = TimeRange.START_OF_DAY;
 
-    // temp variables to access event start and end times 
+    // temp variables to access event start and end Events
     // from startSorted Events and endSortedEvents
-    int currStartTime;
-    int currEndTime;
+    Event startEvent;
+    Event endEvent;
+    int startEventTime;
+    int endEventTime;
 
     // temp variable to store the timeRanges where no events occur
     TimeRange freeSlot;
@@ -64,30 +67,33 @@ public final class FindMeetingQuery {
     //go through day by iterating through times of interest
     // (when an event ends or starts)
     while (endIndex < maxIndex) {
-      if (busyAttendees < 0) {
+      if (busyAttendees.size() < 0) {
         System.out.println("!!!!CANNOT HAVE NEGATIVE ATTENDEES!!!!!");
         break;
       }
 
-      currEndTime = endSortedEvents.get(endIndex).getWhen().end();
-      currStartTime = startSortedEvents.get(Math.min(startIndex, maxIndex-1))
-          .getWhen().start(); // startIndex could be equal to maxIndex
+      // events in startSortedEvents and endSortedEvents with given indices
+      startEvent = startSortedEvents.get(Math.min(startIndex, maxIndex-1));
+      endEvent = endSortedEvents.get(endIndex);
 
-      if (startIndex == maxIndex || currEndTime <= currStartTime) { // events can only end from this point on
-        freeSlotStart = currEndTime;
-        endIndex++;  
-        busyAttendees--;          
+      endEventTime = endEvent.getWhen().end();
+      startEventTime = startEvent.getWhen().start(); 
+
+      if (startIndex == maxIndex || endEventTime <= startEventTime) { // events can only end from this point on
+        freeSlotStart = endEventTime;
+        busyAttendees.removeAll(endEvent.getAttendees());
+        endIndex++;         
       }
       else { //an event starts now  
-        if (busyAttendees == 0) { 
-          addRange(availableRanges, minDuration, freeSlotStart, currStartTime, false);
+        if (busyAttendees.size() == 0) { 
+          addRange(availableRanges, minDuration, freeSlotStart, startEventTime, false);
         }
+        busyAttendees.addAll(startEvent.getAttendees());
         startIndex ++;
-        busyAttendees++;
       }
     }
 
-    if (busyAttendees == 0) { //Add the time slot at the end of the day
+    if (busyAttendees.size() == 0) { //Add the time slot at the end of the day
       addRange(availableRanges, minDuration, freeSlotStart, TimeRange.END_OF_DAY, true);
     }
     else {
@@ -119,9 +125,19 @@ public final class FindMeetingQuery {
       (Collection<String> requestedAttendees, Collection<Event> events) {
     List<Event> filteredEvents = new ArrayList<>();
     
+    //temporary set including all event attendees in the meeting request
+    Set<String> requestedEventAttendees;
+
+    //temporary Event including only attendees in the eeting request
+    Event trimmedEvent;
+    
+    //only add trimmed events to filteredEvents
     for (Event event: events) {
-      if(eventHasImportantAttendees(event.getAttendees(), requestedAttendees)) {
-        filteredEvents.add(event);
+      requestedEventAttendees = 
+          getRequestedEventAttendees(event.getAttendees(), requestedAttendees);
+      if(requestedEventAttendees.size() > 0) {
+        trimmedEvent = new Event(event.getTitle(), event.getWhen(), requestedEventAttendees);
+        filteredEvents.add(trimmedEvent);
       }
     }
 
@@ -129,18 +145,20 @@ public final class FindMeetingQuery {
   }
 
   /**
-   * Returns if any of the requested attendees are also attending an event
+   * Returns all the requested attendees that are also eventAttendees
    * @param eventAttendees list of people attending an event
    * @param requestedAttendees list of people needed for the meeting
    */
-  private boolean eventHasImportantAttendees(Set<String> eventAttendees, Collection<String> requestedAttendees) {
+  private Set<String> getRequestedEventAttendees(Set<String> eventAttendees, Collection<String> requestedAttendees) {
+
+    Set<String> requestedEventAttendees = new HashSet<>();
     for (String requestedAttendee: requestedAttendees) {
       if (eventAttendees.contains(requestedAttendee)) {
-        return true;
+        requestedEventAttendees.add(requestedAttendee);
       }
     }
 
-    return false;
+    return requestedEventAttendees;
   }
 
   /**
