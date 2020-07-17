@@ -26,10 +26,19 @@ import java.util.HashSet;
  */
 public final class FindMeetingQuery {
   public Collection<TimeRange> query(Collection<Event> events, MeetingRequest request) {
-    List<TimeRange> availableRanges = new ArrayList<>();
+    //Time ranges that only consider mandatory attendees
+    List<TimeRange> freeMandatoryRanges = new ArrayList<>();
+
+    Set<String> mandatoryAttendees = 
+        new HashSet<>(request.getAttendees());
+
+    // Set that contains both mandatory and optional attendees
+    Set<String> allAttendees = 
+        new HashSet<>(request.getOptionalAttendees());
+    allAttendees.addAll(mandatoryAttendees);
 
     List<Event> filteredEvents = 
-        filterEventsByAttendees(request.getAttendees(), events);
+        filterEventsByAttendees(allAttendees, events);
 
     List<Event> startSortedEvents = 
         sortEvents(filteredEvents, Event.ORDER_BY_START);
@@ -86,7 +95,7 @@ public final class FindMeetingQuery {
       }
       else { //an event starts now  
         if (busyAttendees == 0) { 
-          addRange(availableRanges, minDuration, freeSlotStart, startEventTime, false);
+          addRange(freeMandatoryRanges, minDuration, freeSlotStart, startEventTime, false);
         }
         busyAttendees++;
         startIndex ++;
@@ -94,13 +103,13 @@ public final class FindMeetingQuery {
     }
 
     if (busyAttendees == 0) { //Add the time slot at the end of the day
-      addRange(availableRanges, minDuration, freeSlotStart, TimeRange.END_OF_DAY, true);
+      addRange(freeMandatoryRanges, minDuration, freeSlotStart, TimeRange.END_OF_DAY, true);
     }
     else {
       System.out.println("!!!!FINAL BUSY ATTENDEES ="+busyAttendees);
     }
 
-    return availableRanges;
+    return freeMandatoryRanges;
   }
 
   /**
