@@ -27,13 +27,13 @@ public final class FindMeetingQuery {
   public Collection<TimeRange> query(Collection<Event> events, MeetingRequest request) {
     List<TimeRange> availableRanges = new ArrayList<>();
 
-    Collection<Event> filteredEvents = 
+    List<Event> filteredEvents = 
         filterEventsByAttendees(request.getAttendees(), events);
 
-    List<TimeRange> startSortedEvents = 
-        sortEvents(filteredEvents, TimeRange.ORDER_BY_START);
-    List<TimeRange> endSortedEvents =
-        sortEvents(filteredEvents, TimeRange.ORDER_BY_END);
+    List<Event> startSortedEvents = 
+        sortEvents(filteredEvents, Event.ORDER_BY_START);
+    List<Event> endSortedEvents =
+        sortEvents(filteredEvents, Event.ORDER_BY_END);
 
     // min duration of the available time slot
     long minDuration = request.getDuration();
@@ -69,9 +69,9 @@ public final class FindMeetingQuery {
         break;
       }
 
-      currEndTime = endSortedEvents.get(endIndex).end();
-      currStartTime = startSortedEvents.get(
-          Math.min(startIndex, maxIndex-1)).start(); // startIndex could be equal to maxIndex
+      currEndTime = endSortedEvents.get(endIndex).getWhen().end();
+      currStartTime = startSortedEvents.get(Math.min(startIndex, maxIndex-1))
+          .getWhen().start(); // startIndex could be equal to maxIndex
 
       if (startIndex == maxIndex || currEndTime <= currStartTime) { // events can only end from this point on
         freeSlotStart = currEndTime;
@@ -98,21 +98,16 @@ public final class FindMeetingQuery {
   }
 
   /**
-   * Sorts and returns the TimeRanges of the events given using the
-   * comparator
+   * Returns a new collection object with the sorted events
    * @param events collection of events given to the query
    * @param comparator comparator used to sort the event time ranges
    * @return the sorted ArrayList of TimeRanges
    */
-  private ArrayList<TimeRange> sortEvents(Collection<Event> events,Comparator<TimeRange> comparator) {
-    ArrayList<TimeRange> eventTimeRanges = new ArrayList<>();
-
-    for (Event event: events) {
-      eventTimeRanges.add(event.getWhen());
-    }
-
-    eventTimeRanges.sort(comparator);
-    return eventTimeRanges;
+  private List<Event> sortEvents(List<Event> events, 
+      Comparator<Event> comparator) {
+    List<Event> sortedEvents = new ArrayList(events); 
+    sortedEvents.sort(comparator);
+    return sortedEvents;
   }
 
   /**
@@ -120,7 +115,7 @@ public final class FindMeetingQuery {
    * @param requestedAttendees people of interest
    * @param events events that need to be filtered
    */
-  private Collection<Event> filterEventsByAttendees
+  private List<Event> filterEventsByAttendees
       (Collection<String> requestedAttendees, Collection<Event> events) {
     List<Event> filteredEvents = new ArrayList<>();
     
