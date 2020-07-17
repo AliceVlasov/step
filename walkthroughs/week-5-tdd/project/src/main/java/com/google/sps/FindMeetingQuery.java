@@ -49,7 +49,7 @@ public final class FindMeetingQuery {
     int maxIndex = filteredEvents.size();
 
     // keep track of how many attendees are busy before the current time
-    List<String> busyAttendees = new ArrayList<>();
+    int busyAttendees = 0;
 
     // keep track of when a possible available slot begins
     int freeSlotStart = TimeRange.START_OF_DAY;
@@ -67,7 +67,7 @@ public final class FindMeetingQuery {
     //go through day by iterating through times of interest
     // (when an event ends or starts)
     while (endIndex < maxIndex) {
-      if (busyAttendees.size() < 0) {
+      if (busyAttendees < 0) {
         System.out.println("!!!!CANNOT HAVE NEGATIVE ATTENDEES!!!!!");
         break;
       }
@@ -81,19 +81,19 @@ public final class FindMeetingQuery {
 
       if (startIndex == maxIndex || endEventTime <= startEventTime) { // events can only end from this point on
         freeSlotStart = endEventTime;
-        busyAttendees.removeAll(endEvent.getAttendees());
+        busyAttendees--;
         endIndex++;         
       }
       else { //an event starts now  
-        if (busyAttendees.size() == 0) { 
+        if (busyAttendees == 0) { 
           addRange(availableRanges, minDuration, freeSlotStart, startEventTime, false);
         }
-        busyAttendees.addAll(startEvent.getAttendees());
+        busyAttendees++;
         startIndex ++;
       }
     }
 
-    if (busyAttendees.size() == 0) { //Add the time slot at the end of the day
+    if (busyAttendees == 0) { //Add the time slot at the end of the day
       addRange(availableRanges, minDuration, freeSlotStart, TimeRange.END_OF_DAY, true);
     }
     else {
