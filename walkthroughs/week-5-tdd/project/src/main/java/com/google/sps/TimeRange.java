@@ -173,7 +173,7 @@ public final class TimeRange {
    * included in the range will depend on {@code inclusive}. If {@code inclusive} is {@code true},
    * then @{code end} will be in the range.
    */
-  public static TimeRange fromStartEnd(int start, int end, boolean inclusive) {
+  public static TimeRange fromStartEnd(int start, int end, boolean inclusive) { //TODO: throw exception if end is before start
     return inclusive ? new TimeRange(start, end - start + 1) : new TimeRange(start, end - start);
   }
 
@@ -181,6 +181,7 @@ public final class TimeRange {
    * Create a {@code TimeRange} starting at {@code start} with a duration equal to {@code duration}.
    */
   public static TimeRange fromStartDuration(int start, int duration) {
+    //TODO: throw exception if duration is negative;
     return new TimeRange(start, duration);
   }
 }
