@@ -13,216 +13,98 @@
 // limitations under the License.
 
 package com.google.sps;
-
 import java.util.Collection;
-import java.util.Comparator;
 import java.util.List;
 import java.util.ArrayList;
 import java.util.Set;
 import java.util.HashSet;
 
 /**
- * Find all possible meeting times that satisfy the request and do not overlap with events unless event attendees are optional meeting attendees
+ * Find best time slots when a meeting can occur
  */
 public final class FindMeetingQuery {
-  public Collection<TimeRange> query(Collection<Event> events, MeetingRequest request) {
-    // potential meeting time ranges that consider 
-    // mandatory attendees and all attendees
-    List<TimeRange> mandatoryRanges = new ArrayList<>();
-    List<TimeRange> optionalRanges = new ArrayList<>();
 
-    // all mandatory attendees requested for the meeting
-    Set<String> mandatoryAttendees = 
-        new HashSet<>(request.getAttendees());
+  // stores and updates possible meeting slot times
+  private MeetingSlotTracker meetingSlotTracker;
 
-    // if there are no mandatory attendees, all optional attendees will be 
-    // treated as mandatory attendees
-    if (mandatoryAttendees.size() == 0) {
-      mandatoryAttendees = new HashSet<>(request.getOptionalAttendees());
-    }
+  // Iterates through the times of interest of the day
+  // and retrieves the current event's information
+  private EventIterator eventIterator;
 
-    // both mandatory and optional attendees requested for the meeting
-    Set<String> allAttendees = new HashSet<>(mandatoryAttendees);
-    allAttendees.addAll(request.getOptionalAttendees());
+  // keeps track of busy attendees
+  private AttendeesTracker attendeesTracker;
 
-    // events that only include attendees requested for the meeting
-    List<Event> filteredEvents = 
-        filterEventsByAttendees(allAttendees, events);
+  /**
+   * Returns all the time when the meeting should be scheduled
+   */
+  public Collection<TimeRange> query
+          (Collection<Event> events, MeetingRequest request) {
+    setUp(request, events);
 
-    // filtered event lists sorted by start and end times
-    List<Event> startSortedEvents = 
-        sortEvents(filteredEvents, Event.ORDER_BY_START);
-    List<Event> endSortedEvents =
-        sortEvents(filteredEvents, Event.ORDER_BY_END);
+    while (eventIterator.notDone()) {   
+      if (eventIterator.eventEndsNow()) {
+        meetingSlotTracker.setPotentialMeetingSlotStart();
 
-    // min duration of the available time slot
-    long minDuration = request.getDuration();
-
-    // index of the current position in startSortedEvents and endSortedEvents
-    int startIndex = 0;
-    int endIndex = 0;
-
-    // The maximum value startIndex and endIndex can have 
-    int maxIndex = filteredEvents.size();
-
-    // keep track of how many mandatory and optional attendees are busy
-    int busyMandatoryAttendees = 0;
-    int busyOptionalAttendees = 0;
-
-    // keep track of when a possible available slot for 
-    // mandatory attendees and all attendees begins
-    int freeMandatorySlotStart = TimeRange.START_OF_DAY;
-    int freeOptionalSlotStart = TimeRange.START_OF_DAY;
-
-    // temp variables to access necessary events and event times
-    Event startEvent;
-    Event endEvent;
-    int startEventTime;
-    int endEventTime;
-
-    // temp variables to access everyone attending an event and 
-    // how many of those are mandatory for the meeting
-    Set<String> eventAttendees;
-    int mandatoryEventAttendees;
-
-    // go through day by iterating through times of interest
-    // (when an event ends or starts)
-    while (endIndex < maxIndex) {
-      if (busyMandatoryAttendees < 0 || busyOptionalAttendees < 0) {
-        System.out.println("!!!!CANNOT HAVE NEGATIVE ATTENDEES!!!!!");
-        break;
-      }
-
-      // access events in startSortedEvents and endSortedEvents 
-      // with given indices and their start times
-      startEvent = startSortedEvents.get(Math.min(startIndex, maxIndex-1));
-      startEventTime = startEvent.getWhen().start(); 
-      endEvent = endSortedEvents.get(endIndex);
-      endEventTime = endEvent.getWhen().end();
-      
-
-      // an event ends now
-      if (startIndex == maxIndex || endEventTime <= startEventTime) {
-        // get all attendees and # of mandatory attendees joining this event 
-        eventAttendees = endEvent.getAttendees();
-        mandatoryEventAttendees = 
-            getIntersection(mandatoryAttendees, eventAttendees).size();
-
-        // mandatory attendees are leaving this event
-        if (mandatoryEventAttendees > 0) {
-          freeMandatorySlotStart = endEventTime;
-          busyMandatoryAttendees -= mandatoryEventAttendees;
-        }
-
-        // optional attendees are leaving the event too
-        freeOptionalSlotStart = endEventTime;
-        busyOptionalAttendees -= (eventAttendees.size() - mandatoryEventAttendees);
-
-        endIndex++;         
+        attendeesTracker.updateBusyAttendees();        
       } 
-      else { // an event starts now        
+      else { // an event starts now
+        if (attendeesTracker.noBusyMandatoryAttendees()) {
+          meetingSlotTracker.addMandatorySlot();
 
-        // check if time slot works for mandatory attendees only
-        if (busyMandatoryAttendees == 0) {        
-          addRange(mandatoryRanges, minDuration, freeMandatorySlotStart, startEventTime, false);
-
-          // check if time slot works for optional attendees as well
-          if (busyOptionalAttendees == 0) {
-            addRange(optionalRanges, minDuration, freeOptionalSlotStart, startEventTime, false);
+          if (attendeesTracker.noBusyOptionalAttendees()) {
+            meetingSlotTracker.addAllAvailableSlot();
           }
         }
-
-        // get all attendees and # of mandatory attendees joining this event
-        eventAttendees = startEvent.getAttendees();
-        mandatoryEventAttendees = 
-            getIntersection(mandatoryAttendees, eventAttendees).size();
-
-        // mandatory attendees are joining this event
-        if (mandatoryEventAttendees > 0) {
-          busyMandatoryAttendees += mandatoryEventAttendees;
-        }
-        
-        // optional attendees are joining the event too
-        busyOptionalAttendees += (eventAttendees.size() - mandatoryEventAttendees);
-
-        startIndex ++;
+        attendeesTracker.updateBusyAttendees();
       }
+      eventIterator.update();  
     }
+    meetingSlotTracker.addEndOfDayTimeSlots();
+    return meetingSlotTracker.getMeetingTimeSlots();
+  }
 
-    if (busyMandatoryAttendees != 0 || busyOptionalAttendees != 0) {
-      System.out.println("!!!!! Something went wrong !!!!!");
-    }
-
-    // all attendees are available after the last event ends so
-    // consider time slot from last event ending to end of the day      
-    addRange(mandatoryRanges, minDuration, freeMandatorySlotStart, TimeRange.END_OF_DAY, true);
-    addRange(optionalRanges, minDuration, freeOptionalSlotStart, TimeRange.END_OF_DAY, true);
-
-    // return appropriate time range list
-    if (optionalRanges.size() == 0) {
-      return mandatoryRanges;
-    } else {
-      return optionalRanges;
-    }
+  private void setUp(MeetingRequest request, Collection<Event> events) {
+    List<TrimmedEvent> trimmedEvents = filterEventsByAttendees(request, events);
+    this.eventIterator = new EventIterator(trimmedEvents);
+    this.attendeesTracker = new AttendeesTracker(request, eventIterator);
+    this.meetingSlotTracker = new MeetingSlotTracker(request, eventIterator, attendeesTracker);   
   }
 
   /**
-   * Removes all non-requested attendees from the events and 
-   * returns a list of events that only include requested attendees
+   * Returns a list of trimmed events identical to the events given except
+   * only including mandatory and optional meeting attendees
    * @param requestedAttendees people of interest
    * @param events events that need to be filtered
    */
-  private List<Event> filterEventsByAttendees
-      (Collection<String> requestedAttendees, Collection<Event> events) {
-    List<Event> filteredEvents = new ArrayList<>();
+  private List<TrimmedEvent> filterEventsByAttendees
+        (MeetingRequest request, Collection<Event> events) {
+    List<TrimmedEvent> filteredEvents = new ArrayList<>();
     
     // temporary set including all event attendees in the meeting request
-    Set<String> requestedEventAttendees;
+    Set<String> mandatoryEventAttendees = new HashSet<>();
+    Set<String> optionalEventAttendees = new HashSet<>();
+    Set<String> eventAttendees = new HashSet<>();
 
     // temporary Event including only attendees in the meeting request
-    Event trimmedEvent;
+    TrimmedEvent trimmedEvent;
     
     // only add trimmed events to filteredEvents
     for (Event event: events) {
-      requestedEventAttendees = 
-          getIntersection(event.getAttendees(), requestedAttendees);
-      if (requestedEventAttendees.size() > 0) {
-        // make a copy of the current event only including requested attendees
-        trimmedEvent = new Event(event.getTitle(), event.getWhen(), requestedEventAttendees);
+      eventAttendees = event.getAttendees();
+      mandatoryEventAttendees = 
+          getIntersection(eventAttendees, request.getAttendees());
+      optionalEventAttendees = 
+          getIntersection(eventAttendees, optionalEventAttendees);
+
+      // make a trimmed event which splits mandatory and optional attendees.
+      trimmedEvent = new TrimmedEvent(event.getTitle(), event.getWhen(), mandatoryEventAttendees, optionalEventAttendees);
+      
+      if (trimmedEvent.hasAttendees()) {
         filteredEvents.add(trimmedEvent);
       }
     }
 
     return filteredEvents;
-  }
-
-  /**
-   * Adds the time slot to the destination if the given time slot is fits 
-   * the minimum duration
-   * @param dest where the TimeRange object should be added
-   * @param minDuration the min duration the slot requires to be added to dest
-   * @param start the start time of the slot
-   * @param end the end time of the slot
-   * @param inclusive whether the end time should be included or not in the slot
-   */
-  private void addRange(List<TimeRange> dest, long minDuration, int start, 
-      int end, boolean inclusive) {
-    TimeRange freeSlot = TimeRange.fromStartEnd(start, end, inclusive);
-    if (freeSlot.duration() >= minDuration) {
-      dest.add(freeSlot);
-    }
-  }
-
-  /**
-   * Returns a sorted list of Events
-   * @param events collection of events given to the query
-   * @param comparator comparator used to sort the event time ranges
-   */
-  private List<Event> sortEvents(List<Event> events, 
-      Comparator<Event> comparator) {
-    List<Event> sortedEvents = new ArrayList(events); 
-    sortedEvents.sort(comparator);
-    return sortedEvents;
   }
 
   /**
