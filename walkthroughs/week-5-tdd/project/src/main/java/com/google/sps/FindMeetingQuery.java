@@ -94,7 +94,7 @@ public final class FindMeetingQuery {
       mandatoryEventAttendees = 
           getIntersection(eventAttendees, request.getAttendees());
       optionalEventAttendees = 
-          getIntersection(eventAttendees, optionalEventAttendees);
+          getIntersection(eventAttendees, request.getOptionalAttendees());
 
       // make a trimmed event which splits mandatory and optional attendees.
       trimmedEvent = new TrimmedEvent(event.getTitle(), event.getWhen(), mandatoryEventAttendees, optionalEventAttendees);

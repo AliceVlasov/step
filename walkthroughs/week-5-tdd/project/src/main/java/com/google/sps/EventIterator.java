@@ -30,7 +30,7 @@ public class EventIterator {
   private Set<String> optionalEventAttendees;
 
   // The maximum value startIndex and endIndex can have 
-  private final int maxIndex = 0;
+  private final int maxIndex;
 
   // index of the current position in startSortedEvents and endSortedEvents
   private int startIndex = 0;
@@ -42,9 +42,12 @@ public class EventIterator {
   private boolean eventEndsNow;
 
   public EventIterator(List<TrimmedEvent> events) {
+    maxIndex = events.size();
     this.startSortedEvents =  sortEvents(events, TrimmedEvent.ORDER_BY_START);
     this.endSortedEvents =  sortEvents(events, TrimmedEvent.ORDER_BY_END);
-    setCurrEvent();
+    if (maxIndex > 0) {
+      setCurrEvent();
+    }
   }
 
   /**
@@ -64,7 +67,7 @@ public class EventIterator {
    * time of interest.
    */
   public boolean notDone() {
-    return this.endIndex < this.maxIndex;
+    return endIndex < maxIndex && maxIndex != 0;
   }  
 
   public void update() {
@@ -76,7 +79,8 @@ public class EventIterator {
     TrimmedEvent startEvent = 
         startSortedEvents.get(Math.min(startIndex, maxIndex-1));
     int startEventTime = startEvent.getWhen().start(); 
-    TrimmedEvent endEvent = endSortedEvents.get(endIndex);
+    TrimmedEvent endEvent = 
+        endSortedEvents.get(Math.min(endIndex, maxIndex-1));
     int endEventTime = endEvent.getWhen().end();
     
     eventEndsNow = startIndex == maxIndex || endEventTime <= startEventTime;
@@ -120,5 +124,9 @@ public class EventIterator {
 
   public boolean eventHasMandatoryAttendees() {
     return mandatoryEventAttendees > 0;
+  }
+
+  public boolean atLastEvent() {
+    return endIndex == maxIndex-1;
   }
 }

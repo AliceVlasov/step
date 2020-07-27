@@ -57,7 +57,6 @@ public class AttendeesTracker {
    * on whether attendees are joining or leaving an event
    */
   public void updateBusyAttendees() {
-
     if (eventIterator.eventHasMandatoryAttendees()) {
       updateBusyMandatoryAttendees();
     }

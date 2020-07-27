@@ -117,9 +117,7 @@ public class MeetingSlotTracker {
   private void addRange
       (List<TimeRange> dest, int start, int end, boolean inclusive, boolean checkOptionalAttendees) {
     TimeRange freeSlot = TimeRange.fromStartEnd(start, end, inclusive);
-
     if (!goodDuration(freeSlot.duration())) return;
-
     if (addWithoutReplacement(checkOptionalAttendees)) {
       dest.add(freeSlot);
     } else if (addWithReplacement(checkOptionalAttendees)) {
